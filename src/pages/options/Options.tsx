@@ -41,10 +41,16 @@ export default function Options() {
     }
   };
 
+  const handleClose = () => {
+    window.close();
+  };
+
   return (
     <div className="container">
       <form onSubmit={handleSubmit} className="settings-form">
-        <h1 className="title">LLM Settings</h1>
+        <div className="form-header">
+          <h1 className="title">LLM Settings</h1>
+        </div>
 
         <div className="form-group">
           <label htmlFor="apiKey">API Key</label>
@@ -56,6 +62,7 @@ export default function Options() {
             onChange={handleChange}
             placeholder="Enter your API key"
             required
+            autoComplete="off"
           />
         </div>
 
@@ -77,7 +84,14 @@ export default function Options() {
           className="save-button"
           disabled={saveStatus === 'saving'}
         >
-          {saveStatus === 'saving' ? 'Saving...' : 'Save Settings'}
+          {saveStatus === 'saving' ? (
+            <>
+              <span className="loading-spinner"></span>
+              Saving...
+            </>
+          ) : (
+            'Save Settings'
+          )}
         </button>
 
         {saveStatus === 'saved' && (
