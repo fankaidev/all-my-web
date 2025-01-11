@@ -1,0 +1,50 @@
+{
+    "name": "all-my-web",
+    "version": "0.0.1",
+    "description": "The single browser extention to manage all my web!",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/fankaidev/all-my-web.git"
+    },
+    "scripts": {
+        "build": "vite build --config vite.config.chrome.ts",
+        "build:chrome": "vite build --config vite.config.chrome.ts",
+        "build:firefox": "vite build --config vite.config.firefox.ts",
+        "dev": "nodemon --config nodemon.chrome.json",
+        "dev:chrome": "nodemon --config nodemon.chrome.json",
+        "dev:firefox": "nodemon --config nodemon.firefox.json"
+    },
+    "type": "module",
+    "dependencies": {
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "webextension-polyfill": "^0.12.0"
+    },
+    "devDependencies": {
+        "@crxjs/vite-plugin": "^2.0.0-beta.28",
+        "@types/chrome": "^0.0.278",
+        "@types/node": "^22.9.0",
+        "@types/react": "^18.3.1",
+        "@types/react-dom": "^18.3.1",
+        "@types/webextension-polyfill": "^0.12.1",
+        "@typescript-eslint/eslint-plugin": "^7.8.0",
+        "@typescript-eslint/parser": "^7.18.0",
+        "@vitejs/plugin-react": "^4.2.1",
+        "autoprefixer": "^10.4.19",
+        "eslint": "^8.56.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-import": "^2.31.0",
+        "eslint-plugin-jsx-a11y": "^6.8.0",
+        "eslint-plugin-react": "^7.34.1",
+        "eslint-plugin-react-hooks": "^4.6.2",
+        "fs-extra": "^11.2.0",
+        "nodemon": "^3.1.7",
+        "postcss": "^8.4.38",
+        "tailwindcss": "^3.4.15",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.6.3",
+        "vite": "^5.4.10",
+        "vite-tsconfig-paths": "^5.1.2"
+    }
+}
