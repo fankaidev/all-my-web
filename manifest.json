@@ -1,25 +1,26 @@
 {
   "manifest_version": 3,
+  "version": "0.0.1",
   "name": "name in manifest.json",
   "description": "description in manifest.json",
   "options_ui": {
     "page": "src/pages/options/index.html"
   },
   "action": {
-    "default_popup": "src/pages/popup/index.html",
     "default_icon": {
       "32": "icon-32.png"
     }
-  },
-  "chrome_url_overrides": {
-    "newtab": "src/pages/newtab/index.html"
   },
   "icons": {
     "128": "icon-128.png"
   },
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "sidePanel"
   ],
+  "side_panel": {
+    "default_path": "src/pages/panel/index.html"
+  },
   "content_scripts": [
     {
       "matches": [
@@ -45,5 +46,9 @@
       ],
       "matches": []
     }
-  ]
+  ],
+  "background": {
+    "service_worker": "src/pages/background/index.ts",
+    "type": "module"
+  }
 }
