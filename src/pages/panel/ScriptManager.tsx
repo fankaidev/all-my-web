@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface Script {
     id: number;
@@ -9,38 +9,79 @@ interface Script {
 const ScriptManager: React.FC = () => {
     const [scripts, setScripts] = useState<Script[]>([]);
     const [editingId, setEditingId] = useState<number | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const addScript = () => {
+    // Load scripts from storage on mount
+    useEffect(() => {
+        const loadScripts = async () => {
+            try {
+                const result = await chrome.storage.local.get('scripts');
+                const storedScripts = result.scripts || [];
+                setScripts(storedScripts);
+            } catch (err) {
+                setError('Failed to load scripts');
+                console.error('Error loading scripts:', err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        loadScripts();
+    }, []);
+
+    const saveToStorage = async (updatedScripts: Script[]) => {
+        try {
+            await chrome.storage.local.set({ scripts: updatedScripts });
+        } catch (err) {
+            setError('Failed to save scripts');
+            console.error('Error saving scripts:', err);
+        }
+    };
+
+    const addScript = async () => {
         const newScript: Script = {
             id: scripts.length ? scripts[scripts.length - 1].id + 1 : 1,
             name: 'New Script',
             body: 'console.log("hello")',
         };
-        setScripts([...scripts, newScript]);
+        const updatedScripts = [...scripts, newScript];
+        setScripts(updatedScripts);
         setEditingId(newScript.id);
+        await saveToStorage(updatedScripts);
     };
 
     const editScript = (id: number) => {
         setEditingId(id);
     };
 
-    const saveScript = (id: number, newName: string, newBody: string) => {
-        console.log('saveScript', id, newName, newBody);
-        setScripts(scripts.map(script =>
+    const saveScript = async (id: number, newName: string, newBody: string) => {
+        const updatedScripts = scripts.map(script =>
             script.id === id
                 ? { ...script, name: newName, body: newBody }
                 : script
-        ));
+        );
+        setScripts(updatedScripts);
         setEditingId(null);
+        await saveToStorage(updatedScripts);
     };
 
     const cancelEdit = () => {
         setEditingId(null);
     };
 
-    const deleteScript = (id: number) => {
-        setScripts(scripts.filter(script => script.id !== id));
+    const deleteScript = async (id: number) => {
+        const updatedScripts = scripts.filter(script => script.id !== id);
+        setScripts(updatedScripts);
+        await saveToStorage(updatedScripts);
     };
+
+    if (isLoading) {
+        return <div className="flex-1 flex items-center justify-center">Loading scripts...</div>;
+    }
+
+    if (error) {
+        return <div className="flex-1 flex items-center justify-center text-red-500">{error}</div>;
+    }
 
     return (
         <div className="flex-1 flex flex-col">

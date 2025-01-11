@@ -8,5 +8,9 @@ Allow users to manage multiple scripts, including adding, deleting, and editing 
 - Implement data storage to keep track of scripts.
 
 ## Tasks
-- Task 1: Design UI components for script management.
-- Task 2: Implement logic for adding, editing, and deleting scripts.
+- [X] Task 1: Design UI components for script management.
+- [X] Task 2: Implement logic for adding, editing, and deleting scripts.
+  - Added persistent storage using chrome.storage.local
+  - Implemented loading and error states
+  - Added storage operations for CRUD
+  - Added loading/error UI

@@ -62,7 +62,6 @@ You should finish tasks one by one, and all proposed code changes should be limi
 It's ok to add unimplemented interfaces or return mocked values, as long as it will be implemented in furthur tasks.
 
 Once the task is finished and verified by tech lead, you should commit current changes before move on to next task.
-Always run `npm test` to make sure all tests are passed before committing changes.
 Commit message should be concise and meaningful, describing all the changes since last commit.
 Stage all changes in project folder unless otherwised specified,
 e.g. `git add . && git commit -m "feat: [S01] add api interface" `
@@ -102,7 +101,7 @@ e.g. `curl -s https://r.jina.ai/URL`
 This project is a chrome extension, built with following frameworks and libraries:
 * TypeScript
 * React
-* pnpm for package management
+* pnpm for package management. NEVER use `npm` or `yarn`.
 * Vite for building and bundling
 * TailwindCSS for styling
 
