@@ -8,8 +8,8 @@ The tech lead will provide requirements and coding advices, which you should fol
 
 For every requirement, unless specified as minor change, you should
 * analyze requirement based on current documents (README.md, worklog, etc.) and codebase
-* update README.md to add a story entry in `Changelog` section
-* add a story document in ./worklog folder, which will contain all the information about the story
+* update `worklog/roadmap.md` to add a story entry in `Stories` section
+* add a story document in `./worklog` folder, which will contain all the information about the story
 * split the story into one or more tasks, and working on each task one by one in design-code-verify-commit loop
   * DO NOT make code changes unless the design is accepted by tech lead.
   * ask tech lead to verify changes before trying to commit changes
@@ -31,9 +31,9 @@ Tech lead might use below shortcuts for fast reply:
 You should organize user request into one or more stories.
 A story is a complete feature or functionality.
 
-For each story, ALWAYS create an item in the end of `Changelog` section in README.md, like
+For each story, ALWAYS create an item in the end of `Stories` section in `worklog/roadmap.md`, like
 ```
-## Changelog
+## Stories
 1. create project skeleton
 2. setup database
 ...
@@ -42,7 +42,7 @@ For each story, ALWAYS create an item in the end of `Changelog` section in READM
 ...
 ```
 
-After Changelog item is created in README, Then create a story document(SD) in ./worklog folder like "S01_proj_skeleton.md" or "S16_refactor_testings.md", with concise and informative filename.
+After story item is created in `worklog/roadmap.md`, Then create a story document(SD) in `./worklog` folder like "S01_proj_skeleton.md" or "S16_refactor_testings.md", with concise and informative filename.
 
 Useful information about the story development should be recorded in the story document:
 * user requirement
@@ -65,7 +65,7 @@ Once the task is finished and verified by tech lead, you should commit current c
 Always run `npm test` to make sure all tests are passed before committing changes.
 Commit message should be concise and meaningful, describing all the changes since last commit.
 Stage all changes in project folder unless otherwised specified,
-e.g. `git add . && git commit -m "[S01] feat: add api interface" `
+e.g. `git add . && git commit -m "feat: [S01] add api interface" `
 
 ONLY start working on next task after the code for previous task is committed.
 
