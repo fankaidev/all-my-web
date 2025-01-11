@@ -1,37 +1,41 @@
 import '@pages/panel/Panel.css';
 import { useEffect, useState } from 'react';
 
+const DEFAULT_SCRIPT = `// Example script: Set page background to gray
+document.body.style.backgroundColor = '#f0f0f0';
+console.log('[amw] background color changed to gray');`;
+
 export default function Panel() {
-  const [script, setScript] = useState('');
+  const [script, setScript] = useState(DEFAULT_SCRIPT);
 
   useEffect(() => {
-    console.debug('[amw]: loading saved script from storage...');
+    console.debug('[amw] loading saved script from storage');
     // Load saved script from storage
     chrome.storage.sync.get(['userScript'], (result) => {
       if (result.userScript) {
-        console.debug('[amw]: found saved script, loading into editor');
+        console.debug('[amw] found saved script, loading into editor');
         setScript(result.userScript);
       } else {
-        console.debug('[amw]: no saved script found');
+        console.debug('[amw] no saved script found, using default script');
       }
     });
   }, []);
 
   const handleSave = async () => {
-    console.debug('[amw]: saving and executing script...');
+    console.debug('[amw] saving and executing script');
     try {
       // Save to storage
       await chrome.storage.sync.set({ userScript: script });
-      console.debug('[amw]: script saved to storage successfully');
+      console.debug('[amw] script saved to storage successfully');
 
       // Get current active tab
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       if (!tab?.id) {
-        console.error('[amw]: no active tab found');
+        console.error('[amw] no active tab found');
         return;
       }
 
-      console.debug('[amw]: executing script in tab:', tab.id);
+      console.debug('[amw] executing script in tab:', tab.id);
       // Execute the script in the active tab
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
@@ -41,16 +45,16 @@ export default function Panel() {
             const scriptEl = document.createElement('script');
             scriptEl.textContent = scriptContent;
             document.head.appendChild(scriptEl);
-            console.log('[amw]: script executed successfully');
+            console.log('[amw] script executed successfully');
           } catch (error) {
-            console.error('[amw]: error executing script in page context:', error);
+            console.error('[amw] error executing script in page context:', error);
           }
         },
         args: [script]
       });
-      console.log('[amw]: script saved and activated successfully');
+      console.log('[amw] script saved and activated successfully');
     } catch (error) {
-      console.error('[amw]: error saving/executing script:', error);
+      console.error('[amw] error saving/executing script:', error);
     }
   };
 
