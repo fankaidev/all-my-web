@@ -105,3 +105,5 @@ This project is a chrome extension, built with following frameworks and librarie
 * pnpm for package management
 * Vite for building and bundling
 * TailwindCSS for styling
+
+## Project Structure

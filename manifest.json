@@ -16,7 +16,14 @@
   },
   "permissions": [
     "activeTab",
-    "sidePanel"
+    "sidePanel",
+    "scripting",
+    "storage",
+    "tabs",
+    "windows"
+  ],
+  "host_permissions": [
+    "<all_urls>"
   ],
   "side_panel": {
     "default_path": "src/pages/panel/index.html"
@@ -44,7 +51,9 @@
         "icon-128.png",
         "icon-32.png"
       ],
-      "matches": []
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ],
   "background": {
