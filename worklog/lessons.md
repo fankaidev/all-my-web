@@ -31,6 +31,7 @@ console.log('[amw] error:' + error); // Use proper error format with comma
    - User must enable Developer Mode in chrome://extensions
    - Scripts can run in isolated world (`USER_SCRIPT`) or main world (`MAIN`)
    - Scripts are cleared when extension updates, need to re-register
+   - refer to [chrome.userScripts](https://developer.chrome.com/docs/extensions/reference/userScripts)
 3. Example of userScripts API usage:
 ```typescript
 // Configure user script world

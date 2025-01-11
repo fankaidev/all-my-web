@@ -11,26 +11,11 @@ async function isDeveloperModeEnabled(): Promise<boolean> {
     }
 }
 
-// Helper function to notify user about script status
-async function notifyUser(message: string, type: 'success' | 'error' = 'success') {
-    try {
-        // Get active tab to show notification in the right context
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        if (tab?.id) {
-            await chrome.tabs.sendMessage(tab.id, { type: 'SCRIPT_STATUS', message, status: type });
-        }
-    } catch (error) {
-        console.error('[amw] failed to notify user:', error);
-    }
-}
-
 // Configure user script world
 async function configureUserScriptWorld() {
     try {
         if (!await isDeveloperModeEnabled()) {
-            const error = 'Developer mode must be enabled in chrome://extensions';
-            console.error('[amw]', error);
-            await notifyUser(error, 'error');
+            console.error('[amw] developer mode must be enabled in chrome://extensions');
             return;
         }
 
@@ -41,7 +26,6 @@ async function configureUserScriptWorld() {
         console.debug('[amw] user script world configured successfully');
     } catch (error) {
         console.error('[amw] failed to configure user script world:', error);
-        await notifyUser('Failed to configure user script world', 'error');
     }
 }
 
@@ -56,13 +40,15 @@ async function registerUserScript(script: string) {
             id: 'amw-user-script',
             matches: ['<all_urls>'],
             js: [{ code: script }],
-            world: 'USER_SCRIPT'
+            world: 'USER_SCRIPT',
+            runAt: 'document_idle'
         }]);
         console.log('[amw] user script registered successfully');
-        await notifyUser('User script registered successfully');
+        // Log registered scripts for debugging
+        const scripts = await chrome.userScripts.getScripts();
+        console.debug('[amw] registered scripts:', scripts);
     } catch (error) {
         console.error('[amw] failed to register user script:', error);
-        await notifyUser(error instanceof Error ? error.message : 'Failed to register user script', 'error');
         throw error;
     }
 }
@@ -105,18 +91,18 @@ chrome.action.onClicked.addListener((tab) => {
 // Listen for storage changes to update user script
 chrome.storage.onChanged.addListener(async (changes) => {
     if (changes.userScript) {
-        console.debug('[amw] user script changed, re-registering');
-        try {
-            // Unregister existing script first
-            await chrome.userScripts.unregister();
-            // Register new script if exists
-            if (changes.userScript.newValue) {
-                await registerUserScript(changes.userScript.newValue);
-            } else {
-                await notifyUser('User script removed');
-            }
-        } catch (error) {
-            console.error('[amw] failed to update user script:', error);
-        }
+        console.debug('[amw] user script changed, do nothing');
     }
 });
+
+// Log registered scripts when page loads
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+    console.debug('[amw] tab updated:', tabId, changeInfo.status, tab.url, tab);
+    try {
+        const scripts = await chrome.userScripts.getScripts();
+        console.debug('[amw] active scripts for tab:', scripts);
+    } catch (error) {
+        console.error('[amw] failed to get registered scripts:', error);
+    }
+});
+
