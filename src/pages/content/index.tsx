@@ -10,20 +10,3 @@ try {
 }
 
 console.debug('[amw] content script loaded');
-
-// Load and execute the user script
-chrome.storage.sync.get(['userScript'], (result) => {
-  if (result.userScript) {
-    console.debug('[amw] found user script, executing');
-    try {
-      // Remove metadata block if exists
-      const cleanScript = result.userScript.replace(/\/\/ ==UserScript==[\s\S]*?\/\/ ==\/UserScript==\s*/m, '');
-      // Execute the script
-      eval(cleanScript);
-    } catch (error) {
-      console.error('[amw] error executing user script:', error);
-    }
-  } else {
-    console.debug('[amw] no user script found');
-  }
-});
