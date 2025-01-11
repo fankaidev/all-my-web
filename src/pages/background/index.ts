@@ -1,16 +1,57 @@
 console.log('[amw] service worker loaded');
 
+// Helper function to check if developer mode is enabled
+async function isDeveloperModeEnabled(): Promise<boolean> {
+    try {
+        // Property access which throws if developer mode is not enabled
+        chrome.userScripts;
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+// Helper function to notify user about script status
+async function notifyUser(message: string, type: 'success' | 'error' = 'success') {
+    try {
+        // Get active tab to show notification in the right context
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (tab?.id) {
+            await chrome.tabs.sendMessage(tab.id, { type: 'SCRIPT_STATUS', message, status: type });
+        }
+    } catch (error) {
+        console.error('[amw] failed to notify user:', error);
+    }
+}
+
 // Configure user script world
-chrome.userScripts.configureWorld({
-    csp: "script-src 'self' 'unsafe-eval'",  // Allow eval in user scripts
-    messaging: true  // Enable messaging between user scripts and extension
-}).catch(error => {
-    console.error('[amw] failed to configure user script world:', error);
-});
+async function configureUserScriptWorld() {
+    try {
+        if (!await isDeveloperModeEnabled()) {
+            const error = 'Developer mode must be enabled in chrome://extensions';
+            console.error('[amw]', error);
+            await notifyUser(error, 'error');
+            return;
+        }
+
+        await chrome.userScripts.configureWorld({
+            csp: "script-src 'self' 'unsafe-eval'",  // Allow eval in user scripts
+            messaging: true  // Enable messaging between user scripts and extension
+        });
+        console.debug('[amw] user script world configured successfully');
+    } catch (error) {
+        console.error('[amw] failed to configure user script world:', error);
+        await notifyUser('Failed to configure user script world', 'error');
+    }
+}
 
 // Helper function to register user script
 async function registerUserScript(script: string) {
     try {
+        if (!await isDeveloperModeEnabled()) {
+            throw new Error('Developer mode must be enabled in chrome://extensions');
+        }
+
         await chrome.userScripts.register([{
             id: 'amw-user-script',
             matches: ['<all_urls>'],
@@ -18,8 +59,10 @@ async function registerUserScript(script: string) {
             world: 'USER_SCRIPT'
         }]);
         console.log('[amw] user script registered successfully');
+        await notifyUser('User script registered successfully');
     } catch (error) {
         console.error('[amw] failed to register user script:', error);
+        await notifyUser(error instanceof Error ? error.message : 'Failed to register user script', 'error');
         throw error;
     }
 }
@@ -34,6 +77,9 @@ chrome.runtime.onInstalled.addListener(async (details) => {
             path: 'src/pages/panel/index.html'
         });
         console.log('[amw] side panel initialized successfully');
+
+        // Configure user script world
+        await configureUserScriptWorld();
 
         // Re-register user script if exists
         const { userScript } = await chrome.storage.sync.get(['userScript']);
@@ -66,6 +112,8 @@ chrome.storage.onChanged.addListener(async (changes) => {
             // Register new script if exists
             if (changes.userScript.newValue) {
                 await registerUserScript(changes.userScript.newValue);
+            } else {
+                await notifyUser('User script removed');
             }
         } catch (error) {
             console.error('[amw] failed to update user script:', error);

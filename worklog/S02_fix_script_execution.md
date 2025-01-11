@@ -18,22 +18,129 @@ Current implementation tries to use `eval()` to execute user scripts, which is b
 4. Re-register scripts on extension update via `runtime.onInstalled`
 
 ## Tasks
-[ ] Task 1: Setup userScripts API
+[X] Task 1: Setup userScripts API
 - Add userScripts permission to manifest.json
 - Configure user script world with CSP
 - Add script registration in background worker
 - Handle extension updates
 
-[ ] Task 2: Add error handling and user feedback
+[X] Task 2: Add error handling and user feedback
 - Add proper error handling for script registration
 - Add developer mode check
 - Add user feedback for registration status
 - Implement logging system for debugging
 
 ## Test Plan
-1. Test basic script execution
-2. Test script with metadata block
-3. Test error handling
-4. Test script execution on different pages
-5. Test script persistence across page reloads
-6. Test behavior when developer mode is disabled
+
+### Test Script
+```javascript
+// ==UserScript==
+// @name         AMW Test Script
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  Test script for All My Web
+// @author       AMW
+// @match        *://*/*
+// @grant        none
+// ==/UserScript==
+
+// Add a test element to verify script execution
+const testDiv = document.createElement('div');
+testDiv.id = 'amw-test-script';
+testDiv.style.cssText = `
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    padding: 12px;
+    background: #3b82f6;
+    color: white;
+    font-family: system-ui;
+    border-radius: 4px;
+    z-index: 999999;
+`;
+testDiv.textContent = 'AMW Test Script Running';
+document.body.appendChild(testDiv);
+
+// Add a counter to test script persistence
+let counter = 0;
+setInterval(() => {
+    counter++;
+    testDiv.textContent = `AMW Test Script Running (${counter}s)`;
+}, 1000);
+
+// Log to verify execution
+console.log('[amw-test] script executed successfully');
+```
+
+### Test Cases
+
+#### 1. Basic Script Execution
+1. Enable Developer Mode in chrome://extensions
+2. Load the extension
+3. Open any webpage (e.g. https://example.com)
+4. Open side panel
+5. Copy test script into script editor
+6. Save the script
+7. Expected Results:
+   - Success notification should appear
+   - Blue box should appear at bottom right
+   - Counter should start incrementing
+   - Console should show success log
+
+#### 2. Script with Metadata Block
+1. Verify that metadata block is properly handled
+2. Expected Results:
+   - Script should execute without errors
+   - Metadata block should not interfere with execution
+
+#### 3. Error Handling
+1. Disable Developer Mode in chrome://extensions
+2. Try to save script
+3. Expected Results:
+   - Error notification about Developer Mode
+   - Script should not execute
+4. Re-enable Developer Mode
+5. Try to save invalid script (e.g. with syntax error)
+6. Expected Results:
+   - Error notification about script error
+   - Previous script should continue running
+
+#### 4. Script Execution on Different Pages
+1. Navigate to different pages:
+   - http://example.com
+   - https://github.com
+   - chrome://extensions
+2. Expected Results:
+   - Script should execute on regular pages
+   - Script should not execute on chrome:// pages
+   - Counter should reset on page navigation
+
+#### 5. Script Persistence
+1. Save script and verify execution
+2. Reload page
+3. Expected Results:
+   - Script should auto-execute after reload
+   - Counter should start from 0
+4. Close and reopen browser
+5. Expected Results:
+   - Script should auto-execute on browser restart
+   - Counter should start from 0
+
+#### 6. Developer Mode Behavior
+1. Start with Developer Mode enabled
+2. Save and verify script
+3. Disable Developer Mode
+4. Expected Results:
+   - Existing script should continue running
+   - Cannot save new scripts
+5. Re-enable Developer Mode
+6. Expected Results:
+   - Can save new scripts again
+
+### Test Results
+[ ] Test 1: Basic Script Execution
+[ ] Test 2: Script with Metadata Block
+[ ] Test 3: Error Handling
+[ ] Test 4: Script Execution on Different Pages
+[ ] Test 5: Script Persistence
+[ ] Test 6: Developer Mode Behavior

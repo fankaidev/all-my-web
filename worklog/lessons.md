@@ -10,66 +10,6 @@
    - `console.error` for errors and failures
    - `console.warn` for warnings and potential issues
 
-## Storage Practices
-1. User scripts are stored in Chrome's sync storage:
-   - Key: 'userScript'
-   - Using `chrome.storage.sync` for cross-device synchronization
-   - Loaded when panel opens
-   - Saved when "Save" is clicked
-2. Benefits of sync storage:
-   - Automatically syncs across user's devices
-   - Persists across browser restarts
-   - No size limit concerns for script storage
-
-## Script Execution
-1. Scripts are executed through content script:
-   - Content script loads automatically on each page
-   - Reads script from storage and executes it
-   - No need for manual script injection
-   - Avoids CSP issues with extension context
-2. Example of content script execution:
-```typescript
-chrome.storage.sync.get(['userScript'], (result) => {
-  if (result.userScript) {
-    try {
-      // Remove metadata block if exists
-      const cleanScript = result.userScript.replace(/\/\/ ==UserScript==[\s\S]*?\/\/ ==\/UserScript==\s*/m, '');
-      // Execute the script
-      eval(cleanScript);
-    } catch (error) {
-      console.error('[amw] error executing user script:', error);
-    }
-  }
-});
-```
-3. Important considerations:
-   - Content script runs in isolated world
-   - Clean up userscript metadata before execution
-   - Handle errors appropriately
-   - Scripts are automatically executed on page load
-
-## Script Format
-1. All scripts should follow the userscript metadata format:
-```javascript
-// ==UserScript==
-// @name         Script Name
-// @namespace    http://tampermonkey.net/
-// @version      0.1
-// @description  Script description
-// @author       Author name
-// @match        *://*/*
-// @grant        none
-// ==/UserScript==
-```
-2. Common metadata fields:
-   - @name: Name of the script
-   - @namespace: Usually your domain or tampermonkey.net
-   - @version: Script version
-   - @description: What the script does
-   - @author: Who wrote it
-   - @match: Which URLs it runs on (e.g., *://*/*, https://*.google.com/*)
-   - @grant: Required permissions (none if no special permissions needed)
-
 ### Examples
 ```typescript
 // Good
@@ -82,3 +22,49 @@ console.error('[amw] failed to execute script:', error);
 console.log('loaded');  // Missing prefix
 console.log('[amw]: saving...'); // Incorrect format with colon after prefix
 console.log('[amw] error:' + error); // Use proper error format with comma
+```
+
+## Chrome Extension Development
+1. In Manifest V3, `eval()` and dynamic code execution is blocked by CSP
+2. For user script execution, use `chrome.userScripts` API:
+   - Requires `userScripts` permission in manifest
+   - User must enable Developer Mode in chrome://extensions
+   - Scripts can run in isolated world (`USER_SCRIPT`) or main world (`MAIN`)
+   - Scripts are cleared when extension updates, need to re-register
+3. Example of userScripts API usage:
+```typescript
+// Configure user script world
+await chrome.userScripts.configureWorld({
+    csp: "script-src 'self' 'unsafe-eval'",  // Allow eval in user scripts
+    messaging: true  // Enable messaging between user scripts and extension
+});
+
+// Register user script
+await chrome.userScripts.register([{
+    id: 'my-script',
+    matches: ['<all_urls>'],
+    js: [{ code: scriptContent }],
+    world: 'USER_SCRIPT'
+}]);
+```
+
+### Developer Mode
+1. Developer Mode is required for userScripts API
+2. Check if Developer Mode is enabled:
+```typescript
+async function isDeveloperModeEnabled(): Promise<boolean> {
+    try {
+        // Property access which throws if developer mode is not enabled
+        chrome.userScripts;
+        return true;
+    } catch {
+        return false;
+    }
+}
+```
+3. Always check before script operations:
+```typescript
+if (!await isDeveloperModeEnabled()) {
+    throw new Error('Developer mode must be enabled in chrome://extensions');
+}
+```
