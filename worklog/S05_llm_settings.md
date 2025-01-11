@@ -38,6 +38,6 @@ interface LLMSettings {
 
 ## Tasks
 [X] Task 1: Create basic options page UI with settings form
-[ ] Task 2: Implement settings storage and retrieval
+[X] Task 2: Implement settings storage and retrieval
 [ ] Task 3: Add validation and error handling
 [ ] Task 4: Add visual feedback for save status

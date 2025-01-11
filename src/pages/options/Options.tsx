@@ -1,10 +1,7 @@
 import '@pages/options/Options.css';
-import React, { useState } from 'react';
-
-interface LLMSettings {
-  apiKey: string;
-  apiBase: string;
-}
+import React, { useEffect, useState } from 'react';
+import { LLMSettings } from '../../types/llm';
+import { loadLLMSettings, saveLLMSettings } from '../../utils/storage';
 
 export default function Options() {
   const [settings, setSettings] = useState<LLMSettings>({
@@ -12,6 +9,15 @@ export default function Options() {
     apiBase: '',
   });
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
+  useEffect(() => {
+    // Load settings when component mounts
+    loadLLMSettings()
+      .then(setSettings)
+      .catch(error => {
+        console.error('Failed to load settings:', error);
+      });
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -25,11 +31,11 @@ export default function Options() {
     e.preventDefault();
     setSaveStatus('saving');
     try {
-      // TODO: Implement storage in next task
-      await new Promise(resolve => setTimeout(resolve, 500)); // Temporary mock
+      await saveLLMSettings(settings);
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (error) {
+      console.error('Failed to save settings:', error);
       setSaveStatus('error');
       setTimeout(() => setSaveStatus('idle'), 2000);
     }
