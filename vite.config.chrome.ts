@@ -1,13 +1,14 @@
-import { resolve } from 'path';
-import { mergeConfig, defineConfig } from 'vite';
 import { crx, ManifestV3Export } from '@crxjs/vite-plugin';
-import baseConfig, { baseManifest, baseBuildOptions } from './vite.config.base'
+import { resolve } from 'path';
+import { defineConfig, mergeConfig } from 'vite';
+import baseConfig, { baseBuildOptions, baseManifest } from './vite.config.base';
 
 const outDir = resolve(__dirname, 'dist_chrome');
 
 export default mergeConfig(
   baseConfig,
   defineConfig({
+    base: './',
     plugins: [
       crx({
         manifest: {

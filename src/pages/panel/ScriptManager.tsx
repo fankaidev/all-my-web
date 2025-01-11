@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-interface Script {
+export interface Script {
     id: number;
     name: string;
     body: string;

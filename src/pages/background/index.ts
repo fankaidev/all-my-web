@@ -48,10 +48,8 @@ async function registerScripts() {
 
         // Unregister all existing AMW scripts
         const existingScripts = await chrome.userScripts.getScripts();
-        await Promise.all(existingScripts
-            .filter(script => script.id.startsWith('amw-script-'))
-            .map(script => chrome.userScripts.unregister({ id: script.id }))
-        );
+        console.debug('[amw] unregistering existing scripts:', existingScripts);
+        await chrome.userScripts.unregister()
 
         // Register all active scripts
         await chrome.userScripts.register(scripts.map(script => ({
