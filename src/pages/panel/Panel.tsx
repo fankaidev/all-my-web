@@ -1,68 +1,27 @@
 import '@pages/panel/Panel.css';
-import { useEffect, useState } from 'react';
-
-const DEFAULT_SCRIPT = `// ==UserScript==
-// @name         Gray Background
-// @namespace    http://tampermonkey.net/
-// @version      0.1
-// @description  Changes the background color to light gray
-// @author       You
-// @match        *://*/*
-// @grant        none
-// ==/UserScript==
-
-
-(function() {
-  'use strict';
-
-  // Change background color to light gray
-  document.body.style.backgroundColor = '#f0f0f0';
-  console.log('[amw] background color changed to gray');
-})();`;
+import { useEffect } from 'react';
+import ScriptManager from './ScriptManager';
 
 export default function Panel() {
-  const [script, setScript] = useState(DEFAULT_SCRIPT);
-
   useEffect(() => {
-    console.debug('[amw] loading saved script from storage');
-    // Load saved script from storage
-    chrome.storage.sync.get(['userScript'], (result) => {
-      if (result.userScript) {
-        console.debug('[amw] found saved script, loading into editor');
-        setScript(result.userScript);
-      } else {
-        console.debug('[amw] no saved script found, using default script');
-      }
-    });
+    console.debug('[amw] Panel component mounted');
   }, []);
 
-  const handleSave = async () => {
-    console.debug('[amw] saving script');
-    try {
-      // Save to storage
-      await chrome.storage.sync.set({ userScript: script });
-      console.log('[amw] script saved successfully');
-    } catch (error) {
-      console.error('[amw] error saving script:', error);
-    }
-  };
-
   return (
-    <div className="container p-4 h-screen flex flex-col bg-white">
-      <h1 className="text-xl font-bold mb-4 text-gray-800">All My Web</h1>
-      <textarea
-        className="flex-grow p-2 mb-4 w-full font-mono text-sm border rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800"
-        value={script}
-        onChange={(e) => setScript(e.target.value)}
-        placeholder="// Enter your script here..."
-        spellCheck="false"
-      />
-      <button
-        onClick={handleSave}
-        className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        Save
-      </button>
+    <div className="min-h-screen bg-gray-100">
+      <div className="container mx-auto px-4 py-6 h-screen flex flex-col">
+        <header className="mb-8">
+          <div className="flex items-center gap-3">
+            <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h1 className="text-2xl font-bold text-gray-800">All My Web</h1>
+          </div>
+          <p className="mt-2 text-gray-600">Manage your web automation scripts</p>
+        </header>
+
+        <ScriptManager />
+      </div>
     </div>
   );
 }
