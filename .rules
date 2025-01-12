@@ -106,3 +106,38 @@ This project is a chrome extension, built with following frameworks and librarie
 * TailwindCSS for styling
 
 ## Project Structure
+
+```
+├── src/
+│   ├── pages/                # Chrome extension pages
+│   │   ├── background/       # Background service worker
+│   │   ├── content/          # Content scripts injected into web pages
+│   │   ├── devtools/         # DevTools panel
+│   │   ├── options/          # Extension options page
+│   │   ├── panel/            # Extension panel UI
+│   │   └── popup/            # Extension popup UI
+│   ├── store/                # Zustand stores
+│   ├── types/                # TypeScript type definitions
+│   └── utils/                # Utility functions
+├── worklog/                  # Development documentation
+│   ├── roadmap.md            # Project roadmap and stories
+│   ├── lessons.md            # Development lessons learned
+│   └── S*/                   # Story documents (S01_, S02_, etc.)
+├── public/                   # Static assets
+├── package.json              # Project dependencies
+└── README.md                 # Project documentation
+```
+
+The project follows a modular structure:
+* `pages/` contains different UI components of the extension
+* `store/` manages application state using Zustand
+* `types/` defines TypeScript interfaces and types
+* `utils/` contains reusable utility functions
+* `worklog/` tracks development progress and documentation
+
+Each extension page (options, panel, popup) follows a similar structure:
+* `index.html` - HTML template
+* `index.tsx` - Entry point
+* `*.tsx` - React components
+* `*.css` - Component styles
+
