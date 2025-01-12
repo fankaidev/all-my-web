@@ -43,7 +43,7 @@ tests/
     - Add test scripts to package.json
     - Setup basic test environment
 
-[ ] Task 2: Setup Chrome API mocking
+[X] Task 2: Setup Chrome API mocking
     - Create Chrome API mock utilities
     - Setup global mocks for common APIs
     - Add helper functions for testing
