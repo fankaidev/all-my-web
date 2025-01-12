@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useLLMSettings } from '../../store/llmSettings';
+import { Script } from '../../types/script';
 import { useLLM } from '../../utils/llm';
-import { Script } from './ScriptManager';
 
 interface ScriptEditorProps {
     script: Script;

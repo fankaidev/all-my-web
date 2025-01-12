@@ -1,5 +1,5 @@
 import React from 'react';
-import { Script } from './ScriptManager';
+import { Script } from '../../types/script';
 
 interface ScriptListProps {
     scripts: Script[];

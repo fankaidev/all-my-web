@@ -7,3 +7,4 @@
 5. Add LLM settings in options page
 6. Implement AI-powered script editor
 7. Add script pause functionality
+8. Refactor script storage to Zustand

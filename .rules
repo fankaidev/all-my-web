@@ -12,6 +12,7 @@ For every requirement, unless specified as minor change, you should
 * add a story document in `./worklog` folder, which will contain all the information about the story
 * split the story into one or more tasks, and working on each task one by one in design-code-verify-commit loop
   * DO NOT make code changes unless the design is accepted by tech lead.
+  * focus on current task only, and don't make changes to other parts of the codebase unless absolutely necessary.
   * ask tech lead to verify changes before trying to commit changes
 
 When tech lead ask to investigate an issue, you should

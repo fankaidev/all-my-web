@@ -1,13 +1,18 @@
 import '@pages/panel/Panel.css';
+import { useEffect } from 'react';
 import { Route, BrowserRouter as Router, Routes, useNavigate, useParams } from 'react-router-dom';
+import useScriptStore from '../../store/scriptStore';
+import { Script } from '../../types/script';
 import ScriptEditor from './ScriptEditor';
 import ScriptList from './ScriptList';
-import { Script } from './ScriptManager';
-import useScripts from './useScripts';
 
 function PanelContent() {
   const navigate = useNavigate();
-  const { scripts, isLoading, error, addScript, editScript, deleteScript, togglePause } = useScripts();
+  const { scripts, isLoading, error, loadScripts, addScript, editScript, deleteScript, togglePause } = useScriptStore();
+
+  useEffect(() => {
+    loadScripts();
+  }, [loadScripts]);
 
   const handleAddScript = async () => {
     const newScript = await addScript();

@@ -1,3 +1,5 @@
+import { Script } from '../../types/script';
+
 console.log('[amw] service worker loaded');
 
 // Helper function to check if developer mode is enabled
@@ -29,13 +31,6 @@ async function configureUserScriptWorld() {
     }
 }
 
-interface Script {
-    id: number;
-    name: string;
-    body: string;
-    isPaused?: boolean;
-}
-
 // Register all active scripts
 async function registerScripts() {
     try {
@@ -53,7 +48,7 @@ async function registerScripts() {
         await chrome.userScripts.unregister()
 
         // Register all active (non-paused) scripts
-        const activeScripts = scripts.filter(script => !script.isPaused);
+        const activeScripts = scripts.filter((script: Script) => !script.isPaused);
         await chrome.userScripts.register(activeScripts.map(script => ({
             id: `amw-script-${script.id}`,
             matches: ['<all_urls>'],
