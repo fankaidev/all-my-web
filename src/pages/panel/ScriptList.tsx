@@ -70,52 +70,64 @@ const ScriptList: React.FC<ScriptListProps> = ({ scripts, onEdit, onDelete, onTo
                                 key={script.id}
                                 className={`bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow ${script.isPaused ? 'opacity-75' : ''}`}
                             >
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-2">
-                                        <h3 className="font-medium text-gray-800">{script.name}</h3>
-                                        {script.isPaused && (
-                                            <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded">
-                                                Paused
-                                            </span>
-                                        )}
-                                        {matched && !script.isPaused && (
-                                            <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded">
-                                                Matched
-                                            </span>
-                                        )}
+                                <div className="space-y-2">
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="font-medium text-gray-800">{script.name}</h3>
+                                            {script.isPaused && (
+                                                <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded">
+                                                    Paused
+                                                </span>
+                                            )}
+                                            {matched && !script.isPaused && (
+                                                <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded">
+                                                    Matched
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => onTogglePause(script.id)}
+                                                className="p-2 text-gray-600 hover:text-yellow-500 transition-colors"
+                                                title={script.isPaused ? "Resume script" : "Pause script"}
+                                            >
+                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    {script.isPaused ? (
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z M19 12a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                    ) : (
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6 M19 12a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                                    )}
+                                                </svg>
+                                            </button>
+                                            <button
+                                                onClick={() => onEdit(script.id)}
+                                                className="p-2 text-gray-600 hover:text-blue-500 transition-colors"
+                                                title="Edit script"
+                                            >
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                            </button>
+                                            <button
+                                                onClick={() => onDelete(script.id)}
+                                                className="p-2 text-gray-600 hover:text-red-500 transition-colors"
+                                                title="Delete script"
+                                            >
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => onTogglePause(script.id)}
-                                            className="p-2 text-gray-600 hover:text-yellow-500 transition-colors"
-                                            title={script.isPaused ? "Resume script" : "Pause script"}
-                                        >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                {script.isPaused ? (
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                                ) : (
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6" />
-                                                )}
-                                            </svg>
-                                        </button>
-                                        <button
-                                            onClick={() => onEdit(script.id)}
-                                            className="p-2 text-gray-600 hover:text-blue-500 transition-colors"
-                                            title="Edit script"
-                                        >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                            </svg>
-                                        </button>
-                                        <button
-                                            onClick={() => onDelete(script.id)}
-                                            className="p-2 text-gray-600 hover:text-red-500 transition-colors"
-                                            title="Delete script"
-                                        >
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
+                                    <div className="text-sm text-gray-500">
+                                        {extractMatchPatterns(script.body).map((pattern, index) => (
+                                            <span key={index} className="inline-flex items-center px-2 py-1 mr-2 mb-1 bg-gray-50 text-gray-600 rounded">
+                                                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                </svg>
+                                                {pattern}
+                                            </span>
+                                        ))}
                                     </div>
                                 </div>
                             </div>

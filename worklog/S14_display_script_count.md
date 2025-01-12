@@ -1,9 +1,10 @@
-# Display Script Count in Extension Icon and Sidebar
+# Display Script Count and Match Rules
 
 ## Requirement
 Display the number of registered scripts for the current web page in:
 1. Extension icon badge
 2. Mark applicable scripts in sidebar with a tag
+3. Show match rules for each script in the list
 
 ## Design
 We need to:
@@ -12,11 +13,12 @@ We need to:
 3. Clear badge when navigating to pages with no scripts
 4. Add "Active" tag for scripts that match current URL
 5. Update script list when URL changes
+6. Display match patterns in a readable format
 
 ### Components
 - Background service: Track script count per tab and update badge
 - Badge API: Use chrome.action.setBadgeText/setBadgeBackgroundColor
-- Panel UI: Display "Active" tag for applicable scripts
+- Panel UI: Display "Active" tag and match patterns for scripts
 - URL matching: Check if script matches current URL
 
 ### Data Flow
@@ -30,6 +32,7 @@ We need to:
    - Get current tab's URL
    - Check each script's match patterns against URL
    - Show "Active" tag for matching scripts
+   - Display match patterns in pill-like containers
 
 ## Tasks
 [X] Task 1: Implement script counting in background service
@@ -51,6 +54,12 @@ We need to:
     - Added tab change listeners to update tags
     - Added comprehensive tests for URL matching
 
+[X] Task 4: Add match pattern display
+    - Added match pattern extraction in script list
+    - Added pill-like containers for patterns
+    - Added link icon for visual clarity
+    - Added tests for pattern display
+
 ## Test Plan
 - Unit tests:
   - Script count tracking ✓
@@ -58,12 +67,14 @@ We need to:
   - Tab change handling ✓
   - URL pattern matching ✓
   - Active tag display ✓
+  - Match pattern display ✓
 - Manual tests:
   - Verify badge shows correct count
   - Check badge updates when adding/removing scripts
   - Verify badge clears when changing tabs
   - Verify "Active" tags match current URL
   - Check tags update when URL changes
+  - Verify match patterns are correctly displayed
 
 ## Implementation Notes
 - Used Map to efficiently track script counts per tab
@@ -74,3 +85,5 @@ We need to:
 - Reused URL matching logic from background service
 - Added real-time updates for Active tags when URL changes
 - Ensured Active tag is not shown for paused scripts
+- Added visual indicators for match patterns with link icons
+- Used consistent styling for tags and patterns

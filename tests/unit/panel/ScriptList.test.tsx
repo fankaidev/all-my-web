@@ -163,4 +163,30 @@ describe('ScriptList', () => {
         const exampleScript = screen.getByText('Example Script').closest('div[class*="bg-white"]');
         expect(exampleScript).not.toHaveTextContent('Active');
     });
+
+    it('should display match patterns for each script', async () => {
+        render(
+            <ScriptList
+                scripts={mockScripts}
+                onEdit={mockHandlers.onEdit}
+                onDelete={mockHandlers.onDelete}
+                onTogglePause={mockHandlers.onTogglePause}
+            />
+        );
+
+        // Wait for URL to be set
+        await vi.waitFor(() => {
+            expect(screen.getByText('Example Script')).toBeInTheDocument();
+        });
+
+        // Should show match patterns
+        expect(screen.getByText('https://example.com/*')).toBeInTheDocument();
+        expect(screen.getByText('https://test.com/*')).toBeInTheDocument();
+
+        // Each pattern should be in a pill-like container
+        const patterns = screen.getAllByText(/https:\/\/.+/);
+        patterns.forEach(pattern => {
+            expect(pattern.closest('span')).toHaveClass('bg-gray-50', 'text-gray-600', 'rounded');
+        });
+    });
 });
