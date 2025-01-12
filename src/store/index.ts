@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Script } from '../pages/panel/ScriptManager';
+import { Script } from '../types/script';
 import { LLMSettings } from '../types/settings';
 
 // Storage state
