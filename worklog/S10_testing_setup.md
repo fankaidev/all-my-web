@@ -37,7 +37,7 @@ tests/
 - Add test scripts to package.json
 
 ## Tasks
-[ ] Task 1: Install and configure Vitest
+[X] Task 1: Install and configure Vitest
     - Add Vitest and related packages
     - Create vitest.config.ts
     - Add test scripts to package.json
