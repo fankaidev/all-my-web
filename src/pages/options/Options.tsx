@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useLLMSettings } from '../../store/llmSettings';
 
 export default function Options() {
-  const { settings, saveStatus, isLoading, setSettings, saveSettings, loadSettings } = useLLMSettings();
+  const { settings, saveStatus, isLoading, validationErrors, setSettings, saveSettings, loadSettings } = useLLMSettings();
 
   useEffect(() => {
     loadSettings();
@@ -17,6 +17,10 @@ export default function Options() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await saveSettings();
+  };
+
+  const getFieldError = (fieldName: string) => {
+    return validationErrors.find(error => error.field === fieldName)?.message;
   };
 
   if (isLoading) {
@@ -47,8 +51,12 @@ export default function Options() {
             placeholder="Enter your API key"
             required
             autoComplete="off"
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 bg-gray-50 focus:bg-white transition-colors"
+            className={`w-full px-4 py-3 rounded-lg border ${getFieldError('apiKey') ? 'border-red-300' : 'border-gray-300'
+              } focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 bg-gray-50 focus:bg-white transition-colors`}
           />
+          {getFieldError('apiKey') && (
+            <p className="mt-2 text-sm text-red-600">{getFieldError('apiKey')}</p>
+          )}
         </div>
 
         <div className="mb-6">
@@ -63,8 +71,12 @@ export default function Options() {
             onChange={handleChange}
             placeholder="https://api.openai.com/v1"
             required
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 bg-gray-50 focus:bg-white transition-colors"
+            className={`w-full px-4 py-3 rounded-lg border ${getFieldError('apiBase') ? 'border-red-300' : 'border-gray-300'
+              } focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 bg-gray-50 focus:bg-white transition-colors`}
           />
+          {getFieldError('apiBase') && (
+            <p className="mt-2 text-sm text-red-600">{getFieldError('apiBase')}</p>
+          )}
         </div>
 
         <button
@@ -87,7 +99,17 @@ export default function Options() {
             Settings saved successfully!
           </div>
         )}
-        {saveStatus === 'error' && (
+        {saveStatus === 'error' && validationErrors.length > 0 && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-800 text-sm font-medium rounded-lg">
+            <p className="text-center mb-2">Please fix the following errors:</p>
+            <ul className="list-disc list-inside">
+              {validationErrors.map((error, index) => (
+                <li key={index}>{error.message}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {saveStatus === 'error' && validationErrors.length === 0 && (
           <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-800 text-sm font-medium rounded-lg text-center">
             Failed to save settings. Please try again.
           </div>
