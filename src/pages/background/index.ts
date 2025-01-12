@@ -1,4 +1,5 @@
 import { Script } from '../../types/script';
+import { extractMatchPatterns } from '../../utils/scriptParser';
 
 console.log('[amw] service worker loaded');
 
@@ -51,7 +52,7 @@ async function registerScripts() {
         const activeScripts = scripts.filter((script: Script) => !script.isPaused);
         await chrome.userScripts.register(activeScripts.map(script => ({
             id: `amw-script-${script.id}`,
-            matches: ['<all_urls>'],
+            matches: extractMatchPatterns(script.body),
             js: [{ code: script.body }],
             world: 'USER_SCRIPT',
             runAt: 'document_idle'

@@ -8,3 +8,4 @@
 6. Implement AI-powered script editor
 7. Add script pause functionality
 8. Refactor script storage to Zustand
+9. Add script URL matching support
