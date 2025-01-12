@@ -48,6 +48,15 @@ const ScriptList: React.FC<ScriptListProps> = ({ scripts, onEdit, onDelete }) =>
                                     </button>
                                 </div>
                             </div>
+                            {script.requirement && (
+                                <div className="mt-2 text-sm text-gray-600">
+                                    <div className="font-medium mb-1">Requirement:</div>
+                                    <div className="bg-gray-50 p-2 rounded">{script.requirement}</div>
+                                </div>
+                            )}
+                            <pre className="mt-2 p-2 bg-gray-50 rounded text-sm text-gray-600 overflow-x-auto">
+                                {script.body}
+                            </pre>
                         </div>
                     ))}
                 </div>

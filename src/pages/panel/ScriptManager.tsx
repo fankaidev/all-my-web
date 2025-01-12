@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 export interface Script {
     id: number;
     name: string;
+    requirement: string;
     body: string;
 }
 
@@ -42,6 +43,7 @@ const ScriptManager: React.FC = () => {
         const newScript: Script = {
             id: scripts.length ? scripts[scripts.length - 1].id + 1 : 1,
             name: 'New Script',
+            requirement: '',
             body: 'console.log("hello")',
         };
         const updatedScripts = [...scripts, newScript];

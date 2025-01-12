@@ -60,7 +60,7 @@ function PanelContent() {
   );
 }
 
-function EditRoute({ scripts, editScript }: { scripts: Script[], editScript: (id: number, name: string, body: string) => Promise<void> }) {
+function EditRoute({ scripts, editScript }: { scripts: Script[], editScript: (id: number, name: string, requirement: string, body: string) => Promise<void> }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const script = scripts.find(s => s.id === parseInt(id || ''));
@@ -72,8 +72,8 @@ function EditRoute({ scripts, editScript }: { scripts: Script[], editScript: (id
   return (
     <ScriptEditor
       script={script}
-      onSave={async (id, name, body) => {
-        await editScript(id, name, body);
+      onSave={async (id, name, requirement, body) => {
+        await editScript(id, name, requirement, body);
         navigate('/');
       }}
       onCancel={() => navigate('/')}

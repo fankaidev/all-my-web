@@ -34,6 +34,7 @@ const useScripts = () => {
         const newScript: Script = {
             id: scripts.length ? scripts[scripts.length - 1].id + 1 : 1,
             name: 'New Script',
+            requirement: '',
             body: 'console.log("hello")',
         };
         const updatedScripts = [...scripts, newScript];
@@ -42,10 +43,10 @@ const useScripts = () => {
         return newScript;
     };
 
-    const editScript = async (id: number, newName: string, newBody: string) => {
+    const editScript = async (id: number, newName: string, newRequirement: string, newBody: string) => {
         const updatedScripts = scripts.map(script =>
             script.id === id
-                ? { ...script, name: newName, body: newBody }
+                ? { ...script, name: newName, requirement: newRequirement, body: newBody }
                 : script
         );
         setScripts(updatedScripts);
