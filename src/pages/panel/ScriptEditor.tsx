@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { useLLMSettings } from '../../store/llmSettings';
 import { Script } from '../../types/script';
 import { useLLM } from '../../utils/llm';
+import { GEN_SCRIPT_PROMPT } from '../../utils/prompts';
 
 interface ScriptEditorProps {
     script: Script;
@@ -36,22 +37,7 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
         }
 
         try {
-            const prompt = `You are a JavaScript expert good at writing user scripts.
-
-You will generate a javascript code snippet according to user request, which will be injected into the browser.
-
-You should make sure this script is functional and safe to run.
-
-The response should contain only the code without any explanation.
-Make sure the response starts with "\`\`\`javascript" and ends with "\`\`\`".
-
-
-<user request>
-${requirementRef.current.value}
-</user request>
-
-
-`;
+            const prompt = GEN_SCRIPT_PROMPT.replace('{requirement}', requirementRef.current.value);
 
             const raw = await generate({
                 model: 'deepseek-chat',
