@@ -11,7 +11,7 @@ For every requirement, unless specified as minor change, you should
 * update `worklog/roadmap.md` to add a story entry in `Stories` section
 * add a story document in `./worklog` folder, which will contain all the information about the story
 * split the story into one or more tasks, and working on each task one by one in design-code-verify-commit loop
-  * DO NOT make code changes unless the design is accepted by tech lead.
+  * NEVER make code changes unless the design is accepted by tech lead.
   * focus on current task only, and don't make changes to other parts of the codebase unless absolutely necessary.
   * ask tech lead to verify changes before trying to commit changes
 
@@ -59,10 +59,11 @@ Each task should be highly focused. For example, for a request like "refactor th
 
 New tasks could be added when story was first created, or when further steps are identified.
 
-You should finish tasks one by one, and all proposed code changes should be limited to current task only.
+After tech lead approved the design, you should finish tasks one by one, and all proposed code changes should be limited to current task only.
 It's ok to add unimplemented interfaces or return mocked values, as long as it will be implemented in furthur tasks.
 
-Once the task is finished and verified by tech lead, you should commit current changes before move on to next task.
+After finished code changes for a task, you should ask tech lead to verify the changes before committing. Once approved, you should commit current changes before move on to next task.
+
 Commit message should be concise and meaningful, describing all the changes since last commit.
 Stage all changes in project folder unless otherwised specified,
 e.g. `git add . && git commit -m "feat: [S01] add api interface" `
