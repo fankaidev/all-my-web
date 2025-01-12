@@ -5,4 +5,7 @@
   - Unit test for scriptParser
   - Store test for scriptStore
   - Component test for ScriptList
-[ ] Task 4: Add test documentation
+[X] Task 4: Add test documentation
+  - Created tests/.rules with testing conventions
+  - Documented test organization, structure, and best practices
+  - Added guidelines for component and store testing

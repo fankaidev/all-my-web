@@ -143,3 +143,86 @@ Each extension page (options, panel, popup) follows a similar structure:
 * `*.tsx` - React components
 * `*.css` - Component styles
 
+# Testing Rules and Conventions
+
+## Test File Organization
+- Test files should mirror the source file structure under `tests/unit/`
+- Test files should be named `*.test.ts` or `*.test.tsx`
+- Each test file should focus on testing a single component/module
+- Group related tests using `describe` blocks
+- Use clear and descriptive test names with `it` blocks
+- Keep test setup files in `tests/setup/` directory
+
+## Test Structure
+- Use `beforeEach` for common setup
+- Clean up mocks after each test
+- Keep tests independent and isolated
+- Follow AAA pattern: Arrange, Act, Assert
+- Use TypeScript for type safety in tests
+
+## Naming Conventions
+- Test files: `ComponentName.test.tsx` or `moduleName.test.ts`
+- Test suites: `describe('ComponentName', () => {...})`
+- Test cases: `it('should do something specific', () => {...})`
+- Mock variables: prefix with `mock`, e.g. `mockScript`, `mockHandlers`
+- Test utilities: suffix with `-utils`, e.g. `test-utils.ts`
+
+## Mocking
+- Mock external dependencies (Chrome API, storage, etc.)
+- Define mocks at the top of the test file
+- Use `vi.mock()` for module mocks
+- Use `vi.fn()` for function mocks
+- Reset mocks in `beforeEach`
+
+### Chrome API Mocking
+- Mock Chrome API at module level using `vi.mock('chrome')`
+- Implement storage operations with Promise-based API
+- Type storage data for better type checking
+- Mock API methods with `vi.fn()` and `mockImplementation`
+- Reset Chrome API mocks before each test
+
+## Component Testing
+- Use `renderWithUser` from test-utils for component tests
+- Test user interactions using `user` from test-utils
+- Use semantic queries (getByText, getByRole) over test IDs when possible
+- Test accessibility attributes when relevant
+- Test component props and state changes
+- Verify event handlers are called with correct arguments
+
+## Store Testing
+- Create a fresh store instance for each test using factory functions
+- Test all store actions independently
+- Verify state updates and side effects
+- Mock storage operations
+- Use `getState()` to access store state in tests
+- Test async operations with proper error handling
+- Verify storage sync operations
+- Test store initialization and default values
+
+## Test Utils
+- Keep reusable test utilities in `tests/setup/`
+- Provide strongly typed helper functions
+- Include common test setup and teardown logic
+- Export test data factories when needed
+- Document utility functions and their usage
+
+## Coverage Requirements
+- Maintain high test coverage for critical paths
+- Test edge cases and error conditions
+- Test async operations thoroughly
+- Test state management and data flow
+- Test error handling and recovery
+- Test initialization and cleanup
+
+## Best Practices
+- Write focused, atomic tests
+- Avoid test interdependence
+- Keep test code as simple as possible
+- Add comments for complex test scenarios
+- Use type checking in test files
+- Test both success and failure cases
+- Follow the same code style as source files
+- Keep mock data minimal and focused
+- Use meaningful test data that represents real use cases
+- Document complex test setups or non-obvious test scenarios
+
