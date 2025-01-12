@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { LLMSettings } from '../types/llm';
+import { LLMSettings } from '../types/settings';
 import { loadLLMSettings, saveLLMSettings } from '../utils/storage';
 
 interface ValidationError {

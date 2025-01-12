@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useLLMSettings } from '../../store/llmSettings';
-import { generateScript } from '../../utils/llm';
+import { useLLM } from '../../utils/llm';
 import { Script } from './ScriptManager';
 
 interface ScriptEditorProps {
@@ -13,9 +13,8 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
     const nameRef = useRef<HTMLInputElement>(null);
     const requirementRef = useRef<HTMLTextAreaElement>(null);
     const bodyRef = useRef<HTMLTextAreaElement>(null);
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const { settings, loadSettings } = useLLMSettings();
+    const { loadSettings } = useLLMSettings();
+    const { generate, generating, error } = useLLM();
 
     useEffect(() => {
         loadSettings();
@@ -36,23 +35,35 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
             return;
         }
 
-        if (!settings.apiKey) {
-            alert('Please configure OpenAI API key in extension options');
-            return;
-        }
-
-        setIsGenerating(true);
-        setError(null);
-
         try {
-            const generatedCode = await generateScript(requirementRef.current.value, settings);
+            const prompt = `You are a JavaScript expert good at writing user scripts.
+
+You will generate a javascript code snippet according to user request, which will be injected into the browser.
+
+You should make sure this script is functional and safe to run.
+
+The response should contain only the code without any explanation.
+Make sure the response starts with "\`\`\`javascript" and ends with "\`\`\`".
+
+
+<user request>
+${requirementRef.current.value}
+</user request>
+
+
+`;
+
+            const raw = await generate({
+                model: 'deepseek-chat',
+                prompt,
+            });
+
+            const generatedCode = raw.replace(/```javascript\n|```/g, '');
             if (bodyRef.current) {
                 bodyRef.current.value = generatedCode;
             }
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to generate script');
-        } finally {
-            setIsGenerating(false);
+            console.error('Failed to generate script:', err);
         }
     };
 
@@ -107,11 +118,11 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
                     <div className="mt-2 flex justify-end">
                         <button
                             onClick={handleGenerate}
-                            disabled={isGenerating}
-                            className={`px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2 ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            disabled={generating}
+                            className={`px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2 ${generating ? 'opacity-50 cursor-not-allowed' : ''}`}
                             title="Generate script using AI"
                         >
-                            {isGenerating ? (
+                            {generating ? (
                                 <>
                                     <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

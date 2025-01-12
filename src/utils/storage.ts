@@ -1,4 +1,4 @@
-import { LLMSettings } from '../types/llm';
+import { LLMSettings } from '../types/settings';
 
 const STORAGE_KEYS = {
     LLM_SETTINGS: 'llm_settings',
