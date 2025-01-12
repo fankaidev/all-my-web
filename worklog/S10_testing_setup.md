@@ -48,7 +48,7 @@ tests/
     - Setup global mocks for common APIs
     - Add helper functions for testing
 
-[ ] Task 3: Add example tests
+[X] Task 3: Add example tests
     - Add unit test for scriptParser
     - Add store test example
     - Add component test example
