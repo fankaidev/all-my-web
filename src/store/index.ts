@@ -29,6 +29,7 @@ const useStore = create<StorageState & UIState>((set, get) => ({
     llmSettings: {
         apiKey: '',
         apiBase: 'https://api.openai.com/v1',
+        modelName: '',
     },
 
     // UI state

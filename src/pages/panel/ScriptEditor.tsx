@@ -1,5 +1,6 @@
 import { PageContext } from '@src/utils/pageContext';
 import React, { useEffect, useRef } from 'react';
+import Warning from '../../components/Warning';
 import { useLLMSettings } from '../../store/llmSettings';
 import { Script } from '../../types/script';
 import { useLLM } from '../../utils/llm';
@@ -23,7 +24,7 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
     const nameRef = useRef<HTMLInputElement>(null);
     const requirementRef = useRef<HTMLTextAreaElement>(null);
     const bodyRef = useRef<HTMLTextAreaElement>(null);
-    const { loadSettings } = useLLMSettings();
+    const { settings, loadSettings } = useLLMSettings();
     const { generate, generating, error } = useLLM();
 
     useEffect(() => {
@@ -71,9 +72,21 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
         }
     };
 
+    const isLLMConfigured = settings.apiKey && settings.modelName;
+
     return (
         <div className="flex-1 bg-gray-50 rounded-lg p-4">
             <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                {!isLLMConfigured && (
+                    <Warning type="warning" title="LLM Settings Required">
+                        Please configure LLM settings to use the script generation feature.
+                        <ol className="list-decimal list-inside mt-2 ml-2">
+                            <li>Click the extension icon and select "Options"</li>
+                            <li>Enter your API Key, API Base URL, and Model Name</li>
+                            <li>Save the settings and return to this page</li>
+                        </ol>
+                    </Warning>
+                )}
                 <div className="flex justify-between items-center mb-4">
                     <input
                         ref={nameRef}
@@ -122,9 +135,9 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
                     <div className="mt-2 flex justify-end">
                         <button
                             onClick={handleGenerate}
-                            disabled={generating}
-                            className={`px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2 ${generating ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            title="Generate script using AI"
+                            disabled={generating || !isLLMConfigured}
+                            className={`px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2 ${(generating || !isLLMConfigured) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            title={!isLLMConfigured ? "Configure LLM settings first" : "Generate script using AI"}
                         >
                             {generating ? (
                                 <>

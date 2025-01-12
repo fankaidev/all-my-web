@@ -16,3 +16,4 @@
 14. Display script count in extension icon
 15. Add privacy policy
 16. Add developer mode warning message
+17. Add LLM settings warning in script editor
