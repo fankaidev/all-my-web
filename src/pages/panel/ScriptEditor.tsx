@@ -40,13 +40,16 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
             const prompt = GEN_SCRIPT_PROMPT.replace('{requirement}', requirementRef.current.value);
 
             const raw = await generate({
-                model: 'deepseek-chat',
                 prompt,
             });
 
-            const generatedCode = raw.replace(/```javascript\n|```/g, '');
-            if (bodyRef.current) {
-                bodyRef.current.value = generatedCode;
+            if (raw.startsWith('```javascript') && raw.endsWith('```')) {
+                const generatedCode = raw.replace(/```javascript\n|```/g, '');
+                if (bodyRef.current) {
+                    bodyRef.current.value = generatedCode;
+                }
+            } else {
+                alert(raw);
             }
         } catch (err) {
             console.error('Failed to generate script:', err);
