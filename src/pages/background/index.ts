@@ -3,6 +3,22 @@ import { extractMatchPatterns, extractRunAt } from '../../utils/scriptParser';
 
 console.log('[amw] service worker loaded');
 
+// Track active scripts per tab
+const tabScriptCounts = new Map<number, number>();
+
+// Update badge for a specific tab
+async function updateBadge(tabId: number) {
+    const count = tabScriptCounts.get(tabId) || 0;
+    await chrome.action.setBadgeText({
+        text: count > 0 ? count.toString() : '',
+        tabId
+    });
+    await chrome.action.setBadgeBackgroundColor({
+        color: '#4CAF50',
+        tabId
+    });
+}
+
 // Helper function to check if developer mode is enabled
 async function isDeveloperModeEnabled(): Promise<boolean> {
     try {
@@ -58,6 +74,20 @@ export async function registerScripts() {
             runAt: extractRunAt(script.body)
         })));
 
+        // Update script counts for all tabs
+        const tabs = await chrome.tabs.query({});
+        for (const tab of tabs) {
+            if (tab.id) {
+                const matchingScripts = activeScripts.filter(script => {
+                    const patterns = extractMatchPatterns(script.body);
+                    return patterns.some(pattern =>
+                        tab.url && tab.url.match(pattern.replace(/\*/g, '.*')));
+                });
+                tabScriptCounts.set(tab.id, matchingScripts.length);
+                await updateBadge(tab.id);
+            }
+        }
+
         console.log('[amw] scripts registered successfully');
         const registeredScripts = await chrome.userScripts.getScripts();
         console.debug('[amw] registered scripts:', registeredScripts);
@@ -107,15 +137,30 @@ chrome.storage.onChanged.addListener(async (changes) => {
     }
 });
 
-// Log registered scripts when page loads
+// Log registered scripts when page loads and update badge
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     console.debug('[amw] tab updated:', tabId, changeInfo.status, tab.url, tab);
     try {
-        const scripts = await chrome.userScripts.getScripts();
-        console.debug('[amw] active scripts for tab:', scripts);
+        if (changeInfo.status === 'complete' && tab.url) {
+            const scripts = await chrome.userScripts.getScripts();
+            console.debug('[amw] active scripts for tab:', scripts);
+
+            // Update script count for this tab
+            const matchingScripts = scripts.filter(script => {
+                return script.matches?.some(pattern =>
+                    tab.url && tab.url.match(pattern.replace(/\*/g, '.*'))) ?? false;
+            });
+            tabScriptCounts.set(tabId, matchingScripts.length);
+            await updateBadge(tabId);
+        }
     } catch (error) {
         console.error('[amw] failed to get registered scripts:', error);
     }
+});
+
+// Clear script count when tab is closed
+chrome.tabs.onRemoved.addListener((tabId) => {
+    tabScriptCounts.delete(tabId);
 });
 
 // Handle context collection requests from panel

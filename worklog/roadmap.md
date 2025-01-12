@@ -13,3 +13,4 @@
 11. Add @run-at directive support
 12. Add model selection in options page
 13. Enhance script generation with page context
+14. Display script count in extension icon
