@@ -10,3 +10,4 @@
 8. Refactor script storage to Zustand
 9. Add script URL matching support
 10. Setup testing framework
+11. Add @run-at directive support

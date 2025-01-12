@@ -1,5 +1,5 @@
 import { Script } from '../../types/script';
-import { extractMatchPatterns } from '../../utils/scriptParser';
+import { extractMatchPatterns, extractRunAt } from '../../utils/scriptParser';
 
 console.log('[amw] service worker loaded');
 
@@ -55,7 +55,7 @@ async function registerScripts() {
             matches: extractMatchPatterns(script.body),
             js: [{ code: script.body }],
             world: 'USER_SCRIPT',
-            runAt: 'document_idle'
+            runAt: extractRunAt(script.body)
         })));
 
         console.log('[amw] scripts registered successfully');

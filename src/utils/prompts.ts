@@ -6,7 +6,6 @@ Please note not all functions of userscript are supported now:
 * @include directive is not supported, you should use @match directive instead.
 * @exclude directive is not supported, you should use @match directive instead.
 * @grant directive is not supported
-* @run-at directive is not supported
 
 The response should contain only the code without any explanation.
 Make sure the response starts with "\`\`\`javascript" and ends with "\`\`\`".

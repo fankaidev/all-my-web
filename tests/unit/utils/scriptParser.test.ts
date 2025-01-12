@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { extractMatchPatterns, isValidMatchPattern } from '../../../src/utils/scriptParser';
+import { extractMatchPatterns, extractRunAt, isValidMatchPattern } from '../../../src/utils/scriptParser';
 
 describe('scriptParser', () => {
     describe('isValidMatchPattern', () => {
@@ -55,6 +55,48 @@ describe('scriptParser', () => {
                 console.log('test');
             `;
             expect(extractMatchPatterns(script)).toEqual(['https://*.example.com/*']);
+        });
+    });
+
+    describe('extractRunAt', () => {
+        it('should extract run-at from single line comment', () => {
+            const script = `
+                // @run-at document_start
+                console.log('test');
+            `;
+            expect(extractRunAt(script)).toBe('document_start');
+        });
+
+        it('should extract run-at from metadata block', () => {
+            const script = `
+                // ==UserScript==
+                // @name Test Script
+                // @run-at document_end
+                // ==UserScript==
+                console.log('test');
+            `;
+            expect(extractRunAt(script)).toBe('document_end');
+        });
+
+        it('should default to document_idle if no run-at found', () => {
+            const script = `console.log('test');`;
+            expect(extractRunAt(script)).toBe('document_idle');
+        });
+
+        it('should default to document_idle for invalid run-at value', () => {
+            const script = `
+                // @run-at invalid_value
+                console.log('test');
+            `;
+            expect(extractRunAt(script)).toBe('document_idle');
+        });
+
+        it('should handle all valid run-at values', () => {
+            const values = ['document_start', 'document_end', 'document_idle'];
+            values.forEach(value => {
+                const script = `// @run-at ${value}`;
+                expect(extractRunAt(script)).toBe(value);
+            });
         });
     });
 });
