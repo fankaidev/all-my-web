@@ -18,6 +18,10 @@ The script MUST follow these rules:
 7. Add descriptive comments for complex logic
 8. The user script should be relative short (less than 100 lines of code) and simple.
 
+# Code Guidelines
+1. always use console.log to indicate start and end of the script
+2. use localStorage for data storage if needed
+3. use fetch to make network requests if needed
 
 
 # Examples
@@ -42,6 +46,7 @@ Add dark mode to this blog
 // ==UserScript==
 
 // Create dark mode styles specific to blog content
+console.log('[Dark Mode] Creating dark mode styles');
 const style = document.createElement('style');
 style.textContent = \`
   body {
@@ -61,6 +66,7 @@ try {
 } catch (error) {
   console.error('[Dark Mode] Failed to apply styles:', error);
 }
+console.log('[Dark Mode] Styles applied');
 \`\`\`
 </output>
 
@@ -84,6 +90,7 @@ Add keyboard shortcuts of "j" (previous), "l" (next), "k" (play/pause) for video
 // @run-at      document_idle
 // ==UserScript==
 
+console.log('[Video Shortcuts] Adding keyboard shortcuts');
 // Add keyboard shortcuts for video player
 document.addEventListener('keydown', (event) => {
   // Only handle if not typing in an input
@@ -108,6 +115,7 @@ document.addEventListener('keydown', (event) => {
     console.error('[Video Shortcuts] Error:', error);
   }
 });
+console.log('[Video Shortcuts] Keyboard shortcuts added');
 \`\`\`
 </output>
 
