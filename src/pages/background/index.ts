@@ -118,3 +118,40 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     }
 });
 
+// Handle context collection requests from panel
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.type === 'GET_PAGE_CONTEXT') {
+        // Get active tab
+        chrome.tabs.query({ active: true, currentWindow: true }, async ([tab]) => {
+            if (!tab?.id) {
+                sendResponse({ success: false, error: 'No active tab found' });
+                return;
+            }
+
+            try {
+                // Get context by injecting script
+                const results = await chrome.scripting.executeScript({
+                    target: { tabId: tab.id },
+                    func: () => {
+                        const url = window.location.href;
+                        const title = document.title;
+                        return { url, title };
+                    }
+                });
+
+                // Send back the first result
+                const context = results[0]?.result;
+                if (!context) {
+                    throw new Error('Failed to collect page context');
+                }
+
+                sendResponse({ success: true, data: context });
+            } catch (error) {
+                console.error('[amw] failed to collect page context:', error);
+                sendResponse({ success: false, error: String(error) });
+            }
+        });
+        return true; // Keep the message channel open for async response
+    }
+});
+

@@ -6,7 +6,7 @@ This script will be injected to web page by a browser extension like Tampermonke
 
 The script MUST follow these rules:
 1. Start with a metadata block using // ==UserScript== format
-2. Include at least one @match directive to specify where the script runs
+2. Use @match directive to control where the script runs, should apply to current domain only if not specified
 3. Optionally include @run-at directive (document_start, document_end, or document_idle)
 4. Do not use unsupported directives, which is listed below:
     - @include
@@ -18,30 +18,39 @@ The script MUST follow these rules:
 7. Add descriptive comments for complex logic
 8. The user script should be relative short (less than 100 lines of code) and simple.
 
+
+
 # Examples
 
 ## Example 1
+<context>
+url: https://example.com/blog
+title: Welcome to Example Blog
+</context>
+
 <requirement>
-Add dark mode to a example.com
+Add dark mode to this blog
 </requirement>
 
 <output>
 \`\`\`javascript
 // ==UserScript==
-// @name        Dark Mode for Example.com
-// @match       https://*.example.com/*
+// @name        Dark Mode for Example Blog
+// @match       https://example.com/blog/*
 // @run-at      document_end
 // ==UserScript==
 
-// Create dark mode styles
+// Create dark mode styles specific to blog content
 const style = document.createElement('style');
 style.textContent = \`
   body {
     background-color: #1a1a1a !important;
     color: #e0e0e0 !important;
   }
+  .blog-content {
+    background: #242424 !important;
+  }
   a { color: #66b3ff !important; }
-  // Add more specific styles as needed
 \`;
 
 // Add styles to page
@@ -55,20 +64,24 @@ try {
 
 
 ## Example 2
+<context>
+url: https://video.example.com/watch?v=123
+title: Example Video Player
+</context>
+
 <requirement>
-Add keyboard shortcuts of "j" (previous), "l" (next), "k" (play/pause) for video players
+Add keyboard shortcuts of "j" (previous), "l" (next), "k" (play/pause) for video player
 </requirement>
 
 <output>
 \`\`\`javascript
 // ==UserScript==
-// @name        Video Shortcuts
-// @match       https://www.youtube.com/*
-// @match       https://www.netflix.com/*
+// @name        Video Shortcuts for Example
+// @match       https://video.example.com/*
 // @run-at      document_idle
 // ==UserScript==
 
-// Add keyboard shortcuts for video players
+// Add keyboard shortcuts for video player
 document.addEventListener('keydown', (event) => {
   // Only handle if not typing in an input
   if (event.target.matches('input, textarea')) return;
@@ -93,11 +106,29 @@ document.addEventListener('keydown', (event) => {
   }
 });
 \`\`\`
+</output>
 
+## Example 3
+<context>
+url: https://news.example.com/article/123
+title: Premium Article - Subscribe Now
+</context>
+
+<requirement>
+Display contents behind a paywall
+</requirement>
+
+<output>
+Sorry, this is not achievable by userscript.
+</output>
 
 # Output
 If the requirement is reasonable and suitable for userscript, output the full code (wrapped by "\`\`\`javascript" and "\`\`\`") without any explanation.
 Otherwise, explain why and suggest alternative solutions.
+
+<context>
+{context}
+</context>
 
 <requirement>
 {requirement}

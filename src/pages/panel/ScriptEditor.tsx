@@ -1,3 +1,4 @@
+import { PageContext } from '@src/utils/pageContext';
 import React, { useEffect, useRef } from 'react';
 import { useLLMSettings } from '../../store/llmSettings';
 import { Script } from '../../types/script';
@@ -9,6 +10,14 @@ interface ScriptEditorProps {
     onSave: (id: number, name: string, requirement: string, body: string) => void;
     onCancel: () => void;
 }
+
+const getPageContext = async (): Promise<PageContext> => {
+    const response = await chrome.runtime.sendMessage({ type: 'GET_PAGE_CONTEXT' });
+    if (!response.success) {
+        throw new Error(response.error || 'Failed to get page context');
+    }
+    return response.data;
+};
 
 const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel }) => {
     const nameRef = useRef<HTMLInputElement>(null);
@@ -37,7 +46,13 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
         }
 
         try {
-            const prompt = GEN_SCRIPT_PROMPT.replace('{requirement}', requirementRef.current.value);
+            const context = await getPageContext();
+            if (!context || !context.url) {
+                alert('Failed to get page context');
+                return;
+            }
+            const prompt = GEN_SCRIPT_PROMPT.replace('{requirement}', requirementRef.current.value)
+                .replace('{context}', JSON.stringify(context));
 
             const raw = await generate({
                 prompt,
