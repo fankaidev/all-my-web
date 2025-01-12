@@ -9,6 +9,10 @@ The single browser extention to manage all my web!
 [X] LLM-powered Script Editor
 [X] Compatibility with user scripts
 
+## Privacy
+
+We take your privacy seriously. Please read our [Privacy Policy](PRIVACY.md) to understand how we handle your data.
+
 ## Userscript Compatibility
 
 The extension supports following userscript directives in script comments:

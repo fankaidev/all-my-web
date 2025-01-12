@@ -1,24 +1,33 @@
-import React from 'react';
-import logo from '@assets/img/logo.svg';
 
 export default function Popup() {
+  const openSidePanel = async () => {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab?.windowId) {
+      chrome.sidePanel.open({ windowId: tab.windowId });
+    }
+  };
+
   return (
-    <div className="absolute top-0 left-0 right-0 bottom-0 text-center h-full p-3 bg-gray-800">
-      <header className="flex flex-col items-center justify-center text-white">
-        <img src={logo} className="h-36 pointer-events-none animate-spin-slow" alt="logo" />
-        <p>
-          Edit <code>src/pages/popup/Popup.jsx</code> and save to reload.
-        </p>
-        <a
-          className="text-blue-400"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <div className="w-64 p-4 bg-white">
+      <div className="flex flex-col items-center space-y-4">
+        <h1 className="text-xl font-bold text-gray-900">All My Web</h1>
+        <button
+          onClick={openSidePanel}
+          className="w-full py-2 px-4 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors"
         >
-          Learn React!
-        </a>
-        <p>Popup styled with TailwindCSS!</p>
-      </header>
+          Open Script Manager
+        </button>
+        <div className="text-center text-sm text-gray-600">
+          <a
+            href="PRIVACY.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-indigo-600 hover:underline"
+          >
+            Privacy Policy
+          </a>
+        </div>
+      </div>
     </div>
   );
 }
