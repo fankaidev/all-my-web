@@ -59,3 +59,9 @@
     - Update README with @run-at directive usage
     - Add examples of different timing values
     - Document default behavior
+
+[X] Task 4: Add integration tests
+    - Add test scripts with different @run-at values
+    - Test script registration with timing
+    - Verify script execution order
+    - Test script timing in real page load

@@ -62,7 +62,9 @@ New tasks could be added when story was first created, or when further steps are
 After tech lead approved the design, you should finish tasks one by one, and all proposed code changes should be limited to current task only.
 It's ok to add unimplemented interfaces or return mocked values, as long as it will be implemented in furthur tasks.
 
-After finished code changes for a task, you should ask tech lead to verify the changes before committing. Once approved, you should commit current changes before move on to next task.
+After finished code changes for a task, you should ask tech lead to verify the changes.
+All tests should also be passed before committing.
+Once approved and tests passed, you should commit current changes before move on to next task.
 
 ## Commit Conventions
 

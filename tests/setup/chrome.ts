@@ -74,18 +74,28 @@ function createStorageMock() {
 interface RegisteredScript extends chrome.userScripts.RegisteredUserScript {
     matches: string[];
     js: { code: string }[];
+    runAt: 'document_start' | 'document_end' | 'document_idle';
+}
+
+interface UserScriptsMock {
+    register: ReturnType<typeof vi.fn>;
+    unregister: ReturnType<typeof vi.fn>;
+    getScripts: ReturnType<typeof vi.fn>;
+    configureWorld: ReturnType<typeof vi.fn>;
+    _scripts: Map<string, RegisteredScript>;
 }
 
 /**
  * Create userScripts mock with registration tracking
  */
-function createUserScriptsMock() {
+function createUserScriptsMock(): UserScriptsMock {
     const registeredScripts = new Map<string, RegisteredScript>();
     return {
         register: vi.fn(async (scripts: Array<{
             id?: string;
             matches: string[];
             js: { code: string }[];
+            runAt: 'document_start' | 'document_end' | 'document_idle';
         }>) => {
             scripts.forEach(script => {
                 const id = script.id || Math.random().toString(36).slice(2);
@@ -100,6 +110,7 @@ function createUserScriptsMock() {
             }
         }),
         getScripts: vi.fn(async () => Array.from(registeredScripts.values())),
+        configureWorld: vi.fn(),
         // Helper to get internal scripts state
         _scripts: registeredScripts,
     };
@@ -110,9 +121,11 @@ function createUserScriptsMock() {
  */
 function createRuntimeMock() {
     const onMessage = createEventHandler();
+    const onInstalled = createEventHandler();
     return {
         getManifest: vi.fn(() => ({ manifest_version: 3 })),
         onMessage,
+        onInstalled,
         sendMessage: vi.fn(async (message: any) => {
             // Simulate message passing
             onMessage.trigger(message, { id: 'sender' });
@@ -126,6 +139,7 @@ function createRuntimeMock() {
 function createTabsMock() {
     const tabs = new Map<number, chrome.tabs.Tab>();
     let lastTabId = 0;
+    const onUpdated = createEventHandler();
 
     return {
         query: vi.fn(async (queryInfo: chrome.tabs.QueryInfo) => {
@@ -158,6 +172,7 @@ function createTabsMock() {
             tabs.set(tabId, tab);
             return tab;
         }),
+        onUpdated,
         // Helper to get internal tabs state
         _tabs: tabs,
     };
@@ -172,6 +187,13 @@ export function createChromeMock() {
         runtime: createRuntimeMock(),
         tabs: createTabsMock(),
         userScripts: createUserScriptsMock(),
+        sidePanel: {
+            setOptions: vi.fn(),
+            open: vi.fn(),
+        },
+        action: {
+            onClicked: createEventHandler(),
+        },
     };
 }
 

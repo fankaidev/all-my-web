@@ -33,7 +33,7 @@ async function configureUserScriptWorld() {
 }
 
 // Register all active scripts
-async function registerScripts() {
+export async function registerScripts() {
     try {
         if (!await isDeveloperModeEnabled()) {
             throw new Error('Developer mode must be enabled in chrome://extensions');
