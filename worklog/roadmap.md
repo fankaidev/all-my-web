@@ -9,3 +9,4 @@
 7. Add script pause functionality
 8. Refactor script storage to Zustand
 9. Add script URL matching support
+10. Setup testing framework
