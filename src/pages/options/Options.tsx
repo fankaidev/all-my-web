@@ -1,49 +1,31 @@
 import '@pages/options/Options.css';
-import React, { useEffect, useState } from 'react';
-import { LLMSettings } from '../../types/llm';
-import { loadLLMSettings, saveLLMSettings } from '../../utils/storage';
+import React, { useEffect } from 'react';
+import { useLLMSettings } from '../../store/llmSettings';
 
 export default function Options() {
-  const [settings, setSettings] = useState<LLMSettings>({
-    apiKey: '',
-    apiBase: '',
-  });
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const { settings, saveStatus, isLoading, setSettings, saveSettings, loadSettings } = useLLMSettings();
 
   useEffect(() => {
-    // Load settings when component mounts
-    loadLLMSettings()
-      .then(setSettings)
-      .catch(error => {
-        console.error('Failed to load settings:', error);
-      });
-  }, []);
+    loadSettings();
+  }, [loadSettings]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setSettings(prev => ({
-      ...prev,
-      [name]: value,
-    }));
+    setSettings({ [name]: value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaveStatus('saving');
-    try {
-      await saveLLMSettings(settings);
-      setSaveStatus('saved');
-      setTimeout(() => setSaveStatus('idle'), 2000);
-    } catch (error) {
-      console.error('Failed to save settings:', error);
-      setSaveStatus('error');
-      setTimeout(() => setSaveStatus('idle'), 2000);
-    }
+    await saveSettings();
   };
 
-  const handleClose = () => {
-    window.close();
-  };
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="w-4 h-4 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
