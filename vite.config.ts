@@ -8,6 +8,9 @@ export default defineConfig({
         react(),
         crx({ manifest })
     ],
+    css: {
+        postcss: './postcss.config.cjs', // Make sure this line is present
+    },
     build: {
         rollupOptions: {
             input: {
