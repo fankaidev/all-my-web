@@ -62,7 +62,7 @@
     - Add URL matching check in background service
     - Only execute scripts on matching pages
 
-[ ] Task 3: Documentation
+[X] Task 3: Documentation
     - Update README with @match directive usage
     - Add examples of common patterns
 
