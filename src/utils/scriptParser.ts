@@ -31,10 +31,10 @@ export function isValidMatchPattern(pattern: string): boolean {
     // Special case: "*://*/*" is valid
     if (pattern === "*://*/*") return true;
 
-    // Regular match pattern: <scheme>://<host>/<path>
-    const schemeSegment = "*|http|https|file|ftp";
-    const hostSegment = "\\*|(?:\\*\\.)?(?:[^/*]+)";
-    const pathSegment = ".*";
+    // Regular match pattern: <scheme>://<host>[:<port>]/<path>
+    const schemeSegment = "\\*|https?|file|ftp|wss?";
+    const hostSegment = "\\*|(?:\\*\\.)?(?:[^/*:]+)(?::\\d+)?";
+    const pathSegment = "[^\\s]*";
 
     const matchPatternRegex = new RegExp(
         `^(${schemeSegment})://(${hostSegment})(/${pathSegment})$`

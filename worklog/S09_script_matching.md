@@ -40,7 +40,7 @@
      - "http://specific.site.com/path/*"
 
 ## Tasks
-[ ] Task 1: Implement match pattern parsing
+[X] Task 1: Implement match pattern parsing
     - Add utility function to extract @match from script content
     - Add pattern validation
     - Write tests for parser
