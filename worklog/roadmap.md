@@ -11,3 +11,4 @@
 9. Add script URL matching support
 10. Setup testing framework
 11. Add @run-at directive support
+12. Add model selection in options page

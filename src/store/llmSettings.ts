@@ -41,10 +41,18 @@ function validateApiBase(apiBase: string): string | null {
     return null;
 }
 
+function validateModelName(modelName: string): string | null {
+    if (!modelName) {
+        return 'Model name is required';
+    }
+    return null;
+}
+
 export const useLLMSettings = create<LLMSettingsState>((set, get) => ({
     settings: {
         apiKey: '',
         apiBase: '',
+        modelName: '',
     },
     saveStatus: 'idle',
     isLoading: false,
@@ -62,6 +70,11 @@ export const useLLMSettings = create<LLMSettingsState>((set, get) => ({
         const apiBaseError = validateApiBase(settings.apiBase);
         if (apiBaseError) {
             errors.push({ field: 'apiBase', message: apiBaseError });
+        }
+
+        const modelNameError = validateModelName(settings.modelName);
+        if (modelNameError) {
+            errors.push({ field: 'modelName', message: modelNameError });
         }
 
         set({ validationErrors: errors });

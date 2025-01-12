@@ -27,7 +27,8 @@ export async function loadLLMSettings(): Promise<LLMSettings> {
         const result = await chrome.storage.sync.get([STORAGE_KEYS.LLM_SETTINGS]);
         return result[STORAGE_KEYS.LLM_SETTINGS] || {
             apiKey: '',
-            apiBase: 'https://api.openai.com/v1',
+            apiBase: '',
+            modelName: '',
         };
     } catch (error) {
         console.error('Failed to load LLM settings:', error);

@@ -79,6 +79,26 @@ export default function Options() {
           )}
         </div>
 
+        <div className="mb-6">
+          <label htmlFor="modelName" className="block text-sm font-medium text-gray-700 mb-2">
+            Model Name
+          </label>
+          <input
+            type="text"
+            id="modelName"
+            name="modelName"
+            value={settings.modelName}
+            onChange={handleChange}
+            placeholder="deepseek-chat"
+            required
+            className={`w-full px-4 py-3 rounded-lg border ${getFieldError('modelName') ? 'border-red-300' : 'border-gray-300'
+              } focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 bg-gray-50 focus:bg-white transition-colors`}
+          />
+          {getFieldError('modelName') && (
+            <p className="mt-2 text-sm text-red-600">{getFieldError('modelName')}</p>
+          )}
+        </div>
+
         <button
           type="submit"
           disabled={saveStatus === 'saving'}

@@ -21,8 +21,8 @@ interface OpenAIResponse {
 }
 
 interface ChatCompletionRequest {
-    model: string;
     prompt: string;
+    model?: string;
     max_tokens?: number;
     temperature?: number;
     top_p?: number;
@@ -45,7 +45,7 @@ async function chatCompletions(request: ChatCompletionRequest, settings: LLMSett
                 'Authorization': `Bearer ${settings.apiKey}`,
             },
             body: JSON.stringify({
-                model: request.model,
+                model: request.model || settings.modelName,
                 messages,
                 max_tokens: request.max_tokens ?? 1000,
                 temperature: request.temperature ?? 0.7,
