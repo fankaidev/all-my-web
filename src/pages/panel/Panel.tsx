@@ -1,6 +1,8 @@
 import '@pages/panel/Panel.css';
 import { useEffect } from 'react';
 import { Route, BrowserRouter as Router, Routes, useNavigate, useParams } from 'react-router-dom';
+import Warning from '../../components/Warning';
+import useDevModeStore from '../../store/devModeStore';
 import useScriptStore from '../../store/scriptStore';
 import { Script } from '../../types/script';
 import ScriptEditor from './ScriptEditor';
@@ -9,10 +11,16 @@ import ScriptList from './ScriptList';
 function PanelContent() {
   const navigate = useNavigate();
   const { scripts, isLoading, error, loadScripts, addScript, editScript, deleteScript, togglePause } = useScriptStore();
+  const { isDevModeEnabled, checkDevModeEnabled } = useDevModeStore();
 
   useEffect(() => {
     loadScripts();
   }, [loadScripts]);
+
+  useEffect(() => {
+    // Check developer mode status on mount and periodically when disabled
+    checkDevModeEnabled();
+  }, [checkDevModeEnabled]);
 
   const handleAddScript = async () => {
     const newScript = await addScript();
@@ -30,6 +38,16 @@ function PanelContent() {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="container mx-auto px-4 py-6 h-screen flex flex-col">
+        {!isDevModeEnabled && (
+          <Warning type="error" title="Developer Mode Required">
+            Please enable Developer Mode in chrome://extensions to use user scripts.
+            <ol className="list-decimal list-inside mt-2 ml-2">
+              <li>Open chrome://extensions in a new tab</li>
+              <li>Enable "Developer mode" in the top right corner</li>
+              <li>Reload this extension</li>
+            </ol>
+          </Warning>
+        )}
         <Routes>
           <Route
             path="/"

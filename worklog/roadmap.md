@@ -15,3 +15,4 @@
 13. Enhance script generation with page context
 14. Display script count in extension icon
 15. Add privacy policy
+16. Add developer mode warning message
