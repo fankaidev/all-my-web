@@ -46,10 +46,10 @@ For each story, ALWAYS create an item in the end of `Stories` section in `worklo
 After story item is created in `worklog/roadmap.md`, Then create a story document(SD) in `./worklog` folder like "S01_proj_skeleton.md" or "S16_refactor_testings.md", with concise and informative filename.
 
 Useful information about the story development should be recorded in the story document:
-* user requirement
-* system design
-* test plan
-* task details
+* user requirement - original request and any clarifications
+* system design - architecture, data flow, and interfaces
+* test plan - test cases and coverage requirements
+* task details - breakdown of implementation steps
 
 ## Tasks
 
@@ -64,9 +64,22 @@ It's ok to add unimplemented interfaces or return mocked values, as long as it w
 
 After finished code changes for a task, you should ask tech lead to verify the changes before committing. Once approved, you should commit current changes before move on to next task.
 
+## Commit Conventions
+
 Commit message should be concise and meaningful, describing all the changes since last commit.
-Stage all changes in project folder unless otherwised specified,
-e.g. `git add . && git commit -m "feat: [S01] add api interface" `
+Stage all changes in project folder unless otherwised specified.
+
+Format: `<type>: [<story-id>] <description>`
+
+Types:
+* feat - new feature or enhancement
+* fix - bug fix
+* refactor - code restructuring without behavior change
+* test - adding or updating tests
+* docs - documentation updates
+* chore - maintenance tasks, dependencies, etc.
+
+Example: `git add . && git commit -m "feat: [S01] add api interface"`
 
 ONLY start working on next task after the code for previous task is committed.
 
@@ -84,6 +97,12 @@ The goal is to help you maintain a big picture as well as the progress of the st
 
 During you development, if you find anything reusable in this project, especially about a fix to a mistake you made or a correction you received, you should take note in the `./worklog/lessons.md` so you will not make the same mistake again.
 
+Each lesson should include:
+* Context - what was the situation
+* Problem - what went wrong
+* Solution - how it was fixed
+* Prevention - how to avoid similar issues
+
 # Tools
 
 You may use following tools to accomplish tasks when needed.
@@ -93,19 +112,48 @@ You may use following tools to accomplish tasks when needed.
 You could use `curl` command to query google custom search.
 `GOOGLE_SEARCH_ENGINE_ID` and `GOOGLE_API_KEY` are already defined as environment variable.
 
+Example:
+```bash
+curl -s "https://www.googleapis.com/customsearch/v1?key=$GOOGLE_API_KEY&cx=$GOOGLE_SEARCH_ENGINE_ID&q=YOUR_QUERY"
+```
+
 ## Web Browser
 
 You could use `curl` command along with `https://r.jina.ai` to get the text content of any URL.
-e.g. `curl -s https://r.jina.ai/URL`
+Example: `curl -s https://r.jina.ai/URL`
+
+Use this for:
+* Reading documentation
+* Researching solutions
+* Checking API references
 
 # Project Setup
 
 This project is a chrome extension, built with following frameworks and libraries:
-* TypeScript
-* React
-* pnpm for package management. NEVER use `npm` or `yarn`.
-* Vite for building and bundling
-* TailwindCSS for styling
+* TypeScript - for type safety and better developer experience
+* React - for building user interfaces
+* pnpm - for package management (NEVER use `npm` or `yarn`)
+* Vite - for building and bundling
+* TailwindCSS - for styling
+* Vitest - for testing
+
+## TypeScript Guidelines
+
+* Use strict mode with `"strict": true`
+* Define interfaces for all data structures
+* Use type inference when types are obvious
+* Avoid `any` type, use `unknown` instead
+* Use union types for better type safety
+* Document complex types with JSDoc comments
+
+## Error Handling
+
+* Use typed error classes for different error types
+* Always handle async errors with try-catch
+* Provide meaningful error messages
+* Log errors with appropriate severity
+* Implement proper error recovery
+* Add error boundaries for React components
 
 ## Project Structure
 
@@ -115,19 +163,22 @@ This project is a chrome extension, built with following frameworks and librarie
 │   │   ├── background/       # Background service worker
 │   │   ├── content/          # Content scripts injected into web pages
 │   │   ├── devtools/         # DevTools panel
-│   │   ├── options/          # Extension options page
-│   │   ├── panel/            # Extension panel UI
-│   │   └── popup/            # Extension popup UI
-│   ├── store/                # Zustand stores
-│   ├── types/                # TypeScript type definitions
-│   └── utils/                # Utility functions
-├── worklog/                  # Development documentation
-│   ├── roadmap.md            # Project roadmap and stories
-│   ├── lessons.md            # Development lessons learned
-│   └── S*/                   # Story documents (S01_, S02_, etc.)
-├── public/                   # Static assets
-├── package.json              # Project dependencies
-└── README.md                 # Project documentation
+│   │   ├── options/         # Extension options page
+│   │   ├── panel/           # Extension panel UI
+│   │   └── popup/           # Extension popup UI
+│   ├── store/               # Zustand stores
+│   ├── types/               # TypeScript type definitions
+│   └── utils/               # Utility functions
+├── tests/                   # Test files
+│   ├── unit/               # Unit tests mirroring src structure
+│   └── setup/              # Test setup and utilities
+├── worklog/                 # Development documentation
+│   ├── roadmap.md           # Project roadmap and stories
+│   ├── lessons.md           # Development lessons learned
+│   └── S*/                  # Story documents (S01_, S02_, etc.)
+├── public/                  # Static assets
+├── package.json             # Project dependencies
+└── README.md               # Project documentation
 ```
 
 The project follows a modular structure:
@@ -136,6 +187,7 @@ The project follows a modular structure:
 * `types/` defines TypeScript interfaces and types
 * `utils/` contains reusable utility functions
 * `worklog/` tracks development progress and documentation
+* `tests/` contains all test-related files
 
 Each extension page (options, panel, popup) follows a similar structure:
 * `index.html` - HTML template
