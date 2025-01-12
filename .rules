@@ -261,12 +261,8 @@ Each extension page (options, panel, popup) follows a similar structure:
 - Document utility functions and their usage
 
 ## Coverage Requirements
-- Maintain high test coverage for critical paths
-- Test edge cases and error conditions
-- Test async operations thoroughly
-- Test state management and data flow
-- Test error handling and recovery
-- Test initialization and cleanup
+- Focus on critical paths and core functionality
+- Keep test suites small and focused
 
 ## Best Practices
 - Write focused, atomic tests
