@@ -33,6 +33,7 @@ interface Script {
     id: number;
     name: string;
     body: string;
+    isPaused?: boolean;
 }
 
 // Register all active scripts
@@ -51,8 +52,9 @@ async function registerScripts() {
         console.debug('[amw] unregistering existing scripts:', existingScripts);
         await chrome.userScripts.unregister()
 
-        // Register all active scripts
-        await chrome.userScripts.register(scripts.map(script => ({
+        // Register all active (non-paused) scripts
+        const activeScripts = scripts.filter(script => !script.isPaused);
+        await chrome.userScripts.register(activeScripts.map(script => ({
             id: `amw-script-${script.id}`,
             matches: ['<all_urls>'],
             js: [{ code: script.body }],

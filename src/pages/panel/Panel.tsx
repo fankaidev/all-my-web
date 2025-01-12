@@ -7,7 +7,7 @@ import useScripts from './useScripts';
 
 function PanelContent() {
   const navigate = useNavigate();
-  const { scripts, isLoading, error, addScript, editScript, deleteScript } = useScripts();
+  const { scripts, isLoading, error, addScript, editScript, deleteScript, togglePause } = useScripts();
 
   const handleAddScript = async () => {
     const newScript = await addScript();
@@ -46,6 +46,7 @@ function PanelContent() {
                   scripts={scripts}
                   onEdit={(id) => navigate(`/edit/${id}`)}
                   onDelete={deleteScript}
+                  onTogglePause={togglePause}
                 />
               </>
             }

@@ -6,3 +6,4 @@
 4. Refactor UI in sidebar
 5. Add LLM settings in options page
 6. Implement AI-powered script editor
+7. Add script pause functionality

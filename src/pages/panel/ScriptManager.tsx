@@ -5,6 +5,7 @@ export interface Script {
     name: string;
     requirement: string;
     body: string;
+    isPaused?: boolean;  // Optional for backward compatibility
 }
 
 const ScriptManager: React.FC = () => {

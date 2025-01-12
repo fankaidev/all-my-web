@@ -5,9 +5,10 @@ interface ScriptListProps {
     scripts: Script[];
     onEdit: (id: number) => void;
     onDelete: (id: number) => void;
+    onTogglePause: (id: number) => void;
 }
 
-const ScriptList: React.FC<ScriptListProps> = ({ scripts, onEdit, onDelete }) => {
+const ScriptList: React.FC<ScriptListProps> = ({ scripts, onEdit, onDelete, onTogglePause }) => {
     return (
         <div className="flex-1 bg-gray-50 rounded-lg p-4 overflow-y-auto">
             {scripts.length === 0 ? (
@@ -23,11 +24,31 @@ const ScriptList: React.FC<ScriptListProps> = ({ scripts, onEdit, onDelete }) =>
                     {scripts.map(script => (
                         <div
                             key={script.id}
-                            className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
+                            className={`bg-white p-4 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow ${script.isPaused ? 'opacity-75' : ''}`}
                         >
                             <div className="flex justify-between items-center">
-                                <h3 className="font-medium text-gray-800">{script.name}</h3>
+                                <div className="flex items-center gap-2">
+                                    <h3 className="font-medium text-gray-800">{script.name}</h3>
+                                    {script.isPaused && (
+                                        <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded">
+                                            Paused
+                                        </span>
+                                    )}
+                                </div>
                                 <div className="flex gap-2">
+                                    <button
+                                        onClick={() => onTogglePause(script.id)}
+                                        className="p-2 text-gray-600 hover:text-yellow-500 transition-colors"
+                                        title={script.isPaused ? "Resume script" : "Pause script"}
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            {script.isPaused ? (
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                            ) : (
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6" />
+                                            )}
+                                        </svg>
+                                    </button>
                                     <button
                                         onClick={() => onEdit(script.id)}
                                         className="p-2 text-gray-600 hover:text-blue-500 transition-colors"
@@ -48,15 +69,6 @@ const ScriptList: React.FC<ScriptListProps> = ({ scripts, onEdit, onDelete }) =>
                                     </button>
                                 </div>
                             </div>
-                            {script.requirement && (
-                                <div className="mt-2 text-sm text-gray-600">
-                                    <div className="font-medium mb-1">Requirement:</div>
-                                    <div className="bg-gray-50 p-2 rounded">{script.requirement}</div>
-                                </div>
-                            )}
-                            <pre className="mt-2 p-2 bg-gray-50 rounded text-sm text-gray-600 overflow-x-auto">
-                                {script.body}
-                            </pre>
                         </div>
                     ))}
                 </div>

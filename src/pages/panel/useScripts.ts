@@ -11,8 +11,12 @@ const useScripts = () => {
             const result = await chrome.storage.local.get('scripts');
             console.debug('[amw] Loaded scripts from storage:', result);
             const storedScripts = result.scripts || [];
-            setScripts(storedScripts);
-            console.debug('[amw] Set scripts state:', storedScripts);
+            const updatedScripts = storedScripts.map((script: Script) => ({
+                ...script,
+                isPaused: script.isPaused || false
+            }));
+            setScripts(updatedScripts);
+            console.debug('[amw] Set scripts state:', updatedScripts);
         } catch (err) {
             setError('Failed to load scripts');
             console.error('Error loading scripts:', err);
@@ -59,6 +63,21 @@ const useScripts = () => {
         await saveToStorage(updatedScripts);
     };
 
+    const togglePause = async (id: number) => {
+        try {
+            const updatedScripts = scripts.map(script =>
+                script.id === id
+                    ? { ...script, isPaused: !script.isPaused }
+                    : script
+            );
+            setScripts(updatedScripts);
+            await saveToStorage(updatedScripts);
+        } catch (err) {
+            setError('Failed to toggle script pause state');
+            console.error('Error toggling script pause state:', err);
+        }
+    };
+
     useEffect(() => {
         loadScripts();
     }, []);
@@ -70,6 +89,7 @@ const useScripts = () => {
         addScript,
         editScript,
         deleteScript,
+        togglePause,
     };
 };
 
