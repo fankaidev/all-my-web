@@ -26,6 +26,7 @@ The script MUST follow these rules:
 <context>
 url: https://example.com/blog
 title: Welcome to Example Blog
+selectionHtml: "<div class='article-content'>This is a sample article with dark text.</div>"
 </context>
 
 <requirement>
@@ -47,8 +48,9 @@ style.textContent = \`
     background-color: #1a1a1a !important;
     color: #e0e0e0 !important;
   }
-  .blog-content {
+  .article-content {
     background: #242424 !important;
+    color: #e0e0e0 !important;
   }
   a { color: #66b3ff !important; }
 \`;
@@ -67,6 +69,7 @@ try {
 <context>
 url: https://video.example.com/watch?v=123
 title: Example Video Player
+selectionHtml: "<video id='main-player' class='video-js'>...</video>"
 </context>
 
 <requirement>
@@ -87,7 +90,7 @@ document.addEventListener('keydown', (event) => {
   if (event.target.matches('input, textarea')) return;
 
   try {
-    const video = document.querySelector('video');
+    const video = document.querySelector('#main-player');
     if (!video) return;
 
     switch(event.key.toLowerCase()) {
@@ -112,6 +115,7 @@ document.addEventListener('keydown', (event) => {
 <context>
 url: https://news.example.com/article/123
 title: Premium Article - Subscribe Now
+selectionHtml: "<div class='paywall'>Subscribe now to read more</div>"
 </context>
 
 <requirement>

@@ -133,9 +133,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 const results = await chrome.scripting.executeScript({
                     target: { tabId: tab.id },
                     func: () => {
-                        const url = window.location.href;
-                        const title = document.title;
-                        return { url, title };
+                        // Get selected HTML if any
+                        const selection = window.getSelection();
+                        let selectionHtml = null;
+                        if (selection && selection.rangeCount > 0) {
+                            const range = selection.getRangeAt(0);
+                            const container = document.createElement('div');
+                            container.appendChild(range.cloneContents());
+                            selectionHtml = container.innerHTML;
+                        }
+
+                        return {
+                            url: window.location.href,
+                            title: document.title,
+                            selectionHtml
+                        };
                     }
                 });
 
