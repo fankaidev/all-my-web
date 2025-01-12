@@ -169,7 +169,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         // Get active tab
         chrome.tabs.query({ active: true, currentWindow: true }, async ([tab]) => {
             if (!tab?.id) {
-                sendResponse({ success: false, error: 'No active tab found' });
+                sendResponse({ success: true, data: { url: '', title: '', selectionHtml: null } });
                 return;
             }
 
@@ -205,7 +205,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 sendResponse({ success: true, data: context });
             } catch (error) {
                 console.error('[amw] failed to collect page context:', error);
-                sendResponse({ success: false, error: String(error) });
+                sendResponse({ success: true, data: { url: '', title: '', selectionHtml: null } });
             }
         });
         return true; // Keep the message channel open for async response

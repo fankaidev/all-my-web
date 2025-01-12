@@ -17,3 +17,4 @@
 15. Add privacy policy
 16. Add developer mode warning message
 17. Add LLM settings warning in script editor
+18. Refactor script editor UI layout

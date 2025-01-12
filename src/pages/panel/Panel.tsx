@@ -37,7 +37,7 @@ function PanelContent() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <div className="container mx-auto px-4 py-6 h-screen flex flex-col">
+      <div className="container mx-auto px-2 py-2 h-screen flex flex-col">
         {!isDevModeEnabled && (
           <Warning type="error" title="Developer Mode Required">
             Please enable Developer Mode in chrome://extensions to use user scripts.
