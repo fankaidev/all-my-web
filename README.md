@@ -10,6 +10,12 @@ For example, you can change the background color of the page, or add a new butto
 
 You have full control of the script, and can further edit it in case you need to.
 
+## Demo
+
+Watch how All My Web works:
+
+[![All My Web Demo](https://img.youtube.com/vi/auxHmExLvpA/0.jpg)](https://www.youtube.com/watch?v=auxHmExLvpA)
+
 
 ## Credit
 
