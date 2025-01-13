@@ -73,7 +73,8 @@ The extension supports following userscript directives in script comments:
 
 ## Privacy
 
-We take your privacy seriously. Please read our [Privacy Policy](PRIVACY.md) to understand how we handle your data.
+We DO NOT collect any data from you.
+Please read our [Privacy Policy](PRIVACY.md) to understand how we handle your data.
 
 
 ## Contributing

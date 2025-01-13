@@ -3,6 +3,9 @@
 ## Introduction
 All My Web is a browser extension that helps users manage and automate their web browsing experience through user scripts. We take your privacy seriously and want to be transparent about what data we collect and how we use it.
 
+Please note this extension full works inside your browser, and does not communicate with our server at all.
+All your data collected as listed below will be stored locally in your browser, and will not be shared with any third parties.
+
 ## Data Collection and Usage
 
 ### 1. User Scripts
