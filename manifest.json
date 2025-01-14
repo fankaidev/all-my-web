@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "version": "0.0.1",
+  "version": "0.1.0",
   "name": "All My Web",
   "description": "The single browser extention to manage all my web!",
   "options_ui": {
