@@ -79,6 +79,11 @@ const ScriptList: React.FC<ScriptListProps> = ({ scripts, onEdit, onDelete, onTo
                                                     Paused
                                                 </span>
                                             )}
+                                            {!matched && !script.isPaused && (
+                                                <span className="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-700 rounded">
+                                                    Skipped
+                                                </span>
+                                            )}
                                             {matched && !script.isPaused && (
                                                 <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded">
                                                     Matched

@@ -91,28 +91,11 @@ interface UserScriptsMock {
 function createUserScriptsMock(): UserScriptsMock {
     const registeredScripts = new Map<string, RegisteredScript>();
     return {
-        register: vi.fn(async (scripts: Array<{
-            id?: string;
-            matches: string[];
-            js: { code: string }[];
-            runAt: 'document_start' | 'document_end' | 'document_idle';
-        }>) => {
-            scripts.forEach(script => {
-                const id = script.id || Math.random().toString(36).slice(2);
-                registeredScripts.set(id, { ...script, id });
-            });
-        }),
-        unregister: vi.fn(async (scriptIds?: string[]) => {
-            if (!scriptIds) {
-                registeredScripts.clear();
-            } else {
-                scriptIds.forEach(id => registeredScripts.delete(id));
-            }
-        }),
-        getScripts: vi.fn(async () => Array.from(registeredScripts.values())),
+        register: vi.fn(),
+        unregister: vi.fn(),
+        getScripts: vi.fn(() => Promise.resolve(Array.from(registeredScripts.values()))),
         configureWorld: vi.fn(),
-        // Helper to get internal scripts state
-        _scripts: registeredScripts,
+        _scripts: registeredScripts
     };
 }
 
@@ -141,6 +124,7 @@ function createTabsMock() {
     let lastTabId = 0;
     const onUpdated = createEventHandler();
     const onActivated = createEventHandler();
+    const onRemoved = createEventHandler();
 
     return {
         query: vi.fn(async (queryInfo: chrome.tabs.QueryInfo) => {
@@ -181,6 +165,7 @@ function createTabsMock() {
         }),
         onUpdated,
         onActivated,
+        onRemoved,
         // Helper to get internal tabs state
         _tabs: tabs,
     };
@@ -200,7 +185,9 @@ export function createChromeMock() {
             open: vi.fn(),
         },
         action: {
-            onClicked: createEventHandler(),
+            setBadgeText: vi.fn(),
+            setBadgeBackgroundColor: vi.fn(),
+            onClicked: createEventHandler()
         },
     };
 }
@@ -208,9 +195,10 @@ export function createChromeMock() {
 /**
  * Reset all Chrome API mocks
  */
-export function resetChromeMocks(chrome: ReturnType<typeof createChromeMock>) {
+export function resetChromeMocks(mockChrome: ReturnType<typeof createChromeMock>) {
     vi.clearAllMocks();
-    chrome.storage._storage.clear();
-    chrome.userScripts._scripts.clear();
-    chrome.tabs._tabs.clear();
+    mockChrome.storage._storage.clear();
+    mockChrome.userScripts._scripts.clear();
+    mockChrome.tabs._tabs.clear();
+    mockChrome.userScripts.getScripts.mockResolvedValue([]);
 }

@@ -25,4 +25,10 @@ beforeEach(async () => {
 
     // Trigger tab activated event
     chromeMock.tabs.onActivated.trigger({ tabId: tab.id!, windowId: 1 });
+
+    // Trigger tab updated event to ensure URL is set
+    chromeMock.tabs.onUpdated.trigger(tab.id!, { status: 'complete' }, tab);
+
+    // Wait a tick to ensure React effects are triggered
+    await new Promise(resolve => setTimeout(resolve, 0));
 });

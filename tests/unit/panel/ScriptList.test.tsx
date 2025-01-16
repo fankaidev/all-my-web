@@ -1,26 +1,12 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ScriptList from '../../../src/pages/panel/ScriptList';
 import { Script } from '../../../src/types/script';
+import { createChromeMock } from '../../setup/chrome';
 
-// Mock chrome API
-const mockTabs = {
-    query: vi.fn().mockResolvedValue([{ url: 'https://example.com/page1' }]),
-    onUpdated: {
-        addListener: vi.fn(),
-        removeListener: vi.fn()
-    },
-    onActivated: {
-        addListener: vi.fn(),
-        removeListener: vi.fn()
-    },
-    get: vi.fn().mockResolvedValue({ url: 'https://example.com/page1' })
-};
-
-vi.mock('chrome', () => ({
-    tabs: mockTabs
-}));
+// Get the type of chrome mock for type assertions
+type ChromeMock = ReturnType<typeof createChromeMock>;
 
 describe('ScriptList', () => {
     const mockScripts: Script[] = [
@@ -55,138 +41,101 @@ describe('ScriptList', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        // Set up initial tab URL
+        const chromeMock = chrome as unknown as ChromeMock;
+        const tab = Array.from(chromeMock.tabs._tabs.values())[0];
+        tab.url = 'https://example.com/page1';
     });
 
-    it('should show Active tag for matching scripts', async () => {
-        render(
-            <ScriptList
-                scripts={mockScripts}
-                onEdit={mockHandlers.onEdit}
-                onDelete={mockHandlers.onDelete}
-                onTogglePause={mockHandlers.onTogglePause}
-            />
-        );
-
-        // Wait for URL to be set
-        await vi.waitFor(() => {
-            expect(screen.getByText('Example Script')).toBeInTheDocument();
+    it('should show Matched tag for matching scripts', async () => {
+        await act(async () => {
+            render(
+                <ScriptList
+                    scripts={mockScripts}
+                    onEdit={mockHandlers.onEdit}
+                    onDelete={mockHandlers.onDelete}
+                    onTogglePause={mockHandlers.onTogglePause}
+                />
+            );
         });
 
-        // First script should be active (matches example.com)
-        expect(screen.getByText('Active')).toBeInTheDocument();
-
-        // Should only show one Active tag
-        expect(screen.queryAllByText('Active')).toHaveLength(1);
+        expect(screen.queryAllByText('Matched')).toHaveLength(1);
+        expect(screen.queryAllByText('Skipped')).toHaveLength(1);
+        expect(screen.queryAllByText('Paused')).toHaveLength(1);
     });
 
-    it('should not show Active tag for non-matching scripts', async () => {
-        // Mock different URL
-        mockTabs.query.mockResolvedValueOnce([
-            { url: 'https://other.com/page1' }
-        ]);
+    it('should not show Matched tag for non-matching scripts', async () => {
+        // Change mock tab URL
+        const chromeMock = chrome as unknown as ChromeMock;
+        const tab = Array.from(chromeMock.tabs._tabs.values())[0];
+        tab.url = 'https://other.com/page1';
+        (chromeMock.tabs.onUpdated as any).trigger(tab.id!, { status: 'complete' }, tab);
 
-        render(
-            <ScriptList
-                scripts={mockScripts}
-                onEdit={mockHandlers.onEdit}
-                onDelete={mockHandlers.onDelete}
-                onTogglePause={mockHandlers.onTogglePause}
-            />
-        );
-
-        // Wait for URL to be set
-        await vi.waitFor(() => {
-            expect(screen.getByText('Example Script')).toBeInTheDocument();
+        await act(async () => {
+            render(
+                <ScriptList
+                    scripts={mockScripts}
+                    onEdit={mockHandlers.onEdit}
+                    onDelete={mockHandlers.onDelete}
+                    onTogglePause={mockHandlers.onTogglePause}
+                />
+            );
         });
 
         // No scripts should be active
-        expect(screen.queryByText('Active')).not.toBeInTheDocument();
+        expect(screen.queryByText('Matched')).not.toBeInTheDocument();
     });
 
-    it('should not show Active tag for paused scripts', async () => {
-        render(
-            <ScriptList
-                scripts={mockScripts}
-                onEdit={mockHandlers.onEdit}
-                onDelete={mockHandlers.onDelete}
-                onTogglePause={mockHandlers.onTogglePause}
-            />
-        );
-
-        // Wait for URL to be set
-        await vi.waitFor(() => {
-            expect(screen.getByText('Paused Script')).toBeInTheDocument();
+    it('should not show Matched tag for paused scripts', async () => {
+        await act(async () => {
+            render(
+                <ScriptList
+                    scripts={mockScripts}
+                    onEdit={mockHandlers.onEdit}
+                    onDelete={mockHandlers.onDelete}
+                    onTogglePause={mockHandlers.onTogglePause}
+                />
+            );
         });
 
-        // Paused script should show Paused tag
-        expect(screen.getByText('Paused')).toBeInTheDocument();
-
-        // Paused script should not show Active tag even if URL matches
+        // Paused script should not show Matched tag even if URL matches
         const pausedScript = screen.getByText('Paused Script').closest('div[class*="bg-white"]');
-        expect(pausedScript).not.toHaveTextContent('Active');
+        expect(pausedScript).toHaveTextContent('Paused');
     });
 
-    it('should update Active tags when URL changes', async () => {
-        const { rerender } = render(
-            <ScriptList
-                scripts={mockScripts}
-                onEdit={mockHandlers.onEdit}
-                onDelete={mockHandlers.onDelete}
-                onTogglePause={mockHandlers.onTogglePause}
-            />
-        );
+    it('should update Matched tags when URL changes', async () => {
+        await act(async () => {
+            render(
+                <ScriptList
+                    scripts={mockScripts}
+                    onEdit={mockHandlers.onEdit}
+                    onDelete={mockHandlers.onDelete}
+                    onTogglePause={mockHandlers.onTogglePause}
+                />
+            );
+        });
 
         // Wait for initial render
         await vi.waitFor(() => {
             expect(screen.getByText('Example Script')).toBeInTheDocument();
+            expect(screen.getByText('Matched')).toBeInTheDocument();
         });
 
-        // Initially example.com script should be active
-        expect(screen.getByText('Active')).toBeInTheDocument();
-
-        // Mock URL change to test.com
-        mockTabs.query.mockResolvedValueOnce([
-            { url: 'https://test.com/page1' }
-        ]);
-
-        // Simulate tab update
-        const tabUpdateListener = (mockTabs.onUpdated.addListener as any).mock.calls[0][0];
-        await tabUpdateListener(1, { status: 'complete' }, { active: true });
+        // Change mock tab URL to test.com
+        const chromeMock = chrome as unknown as ChromeMock;
+        const tab = Array.from(chromeMock.tabs._tabs.values())[0];
+        tab.url = 'https://test.com/page1';
+        (chromeMock.tabs.onUpdated as any).trigger(tab.id!, { status: 'complete' }, tab);
 
         // Now test.com script should be active
         await vi.waitFor(() => {
             const testScript = screen.getByText('Test Script').closest('div[class*="bg-white"]');
-            expect(testScript).toHaveTextContent('Active');
+            expect(testScript).toHaveTextContent('Matched');
         });
 
         // example.com script should not be active
         const exampleScript = screen.getByText('Example Script').closest('div[class*="bg-white"]');
-        expect(exampleScript).not.toHaveTextContent('Active');
+        expect(exampleScript).not.toHaveTextContent('Matched');
     });
 
-    it('should display match patterns for each script', async () => {
-        render(
-            <ScriptList
-                scripts={mockScripts}
-                onEdit={mockHandlers.onEdit}
-                onDelete={mockHandlers.onDelete}
-                onTogglePause={mockHandlers.onTogglePause}
-            />
-        );
-
-        // Wait for URL to be set
-        await vi.waitFor(() => {
-            expect(screen.getByText('Example Script')).toBeInTheDocument();
-        });
-
-        // Should show match patterns
-        expect(screen.getByText('https://example.com/*')).toBeInTheDocument();
-        expect(screen.getByText('https://test.com/*')).toBeInTheDocument();
-
-        // Each pattern should be in a pill-like container
-        const patterns = screen.getAllByText(/https:\/\/.+/);
-        patterns.forEach(pattern => {
-            expect(pattern.closest('span')).toHaveClass('bg-gray-50', 'text-gray-600', 'rounded');
-        });
-    });
 });

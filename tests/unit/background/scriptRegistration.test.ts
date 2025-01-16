@@ -57,10 +57,45 @@ describe('Script Registration', () => {
     beforeEach(() => {
         // Reset all Chrome API mocks
         resetChromeMocks(mockChrome);
+
         // Setup storage with test scripts
-        vi.spyOn(mockChrome.storage.local, 'get').mockImplementation(() => Promise.resolve({ scripts: testScripts }));
-        // Mock developer mode
-        vi.spyOn(mockChrome.userScripts, 'configureWorld').mockImplementation(() => Promise.resolve());
+        mockChrome.storage.local.get.mockResolvedValue({ scripts: testScripts });
+
+        // Mock userScripts API
+        const registeredScripts = new Map();
+        mockChrome.userScripts.register.mockImplementation(async (scripts) => {
+            scripts.forEach(script => {
+                const id = script.id || Math.random().toString(36).slice(2);
+                registeredScripts.set(id, { ...script, id });
+            });
+        });
+        mockChrome.userScripts.getScripts.mockImplementation(async () =>
+            Array.from(registeredScripts.values())
+        );
+        mockChrome.userScripts.configureWorld.mockResolvedValue(undefined);
+
+        // Mock tabs API
+        mockChrome.tabs.onUpdated = {
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            hasListener: vi.fn(),
+            hasListeners: vi.fn(),
+            trigger: vi.fn()
+        };
+        mockChrome.tabs.onActivated = {
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            hasListener: vi.fn(),
+            hasListeners: vi.fn(),
+            trigger: vi.fn()
+        };
+        mockChrome.tabs.onRemoved = {
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            hasListener: vi.fn(),
+            hasListeners: vi.fn(),
+            trigger: vi.fn()
+        };
     });
 
     it('should register scripts with correct @run-at values', async () => {
