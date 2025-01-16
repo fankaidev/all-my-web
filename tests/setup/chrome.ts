@@ -140,14 +140,21 @@ function createTabsMock() {
     const tabs = new Map<number, chrome.tabs.Tab>();
     let lastTabId = 0;
     const onUpdated = createEventHandler();
+    const onActivated = createEventHandler();
 
     return {
         query: vi.fn(async (queryInfo: chrome.tabs.QueryInfo) => {
             return Array.from(tabs.values()).filter(tab => {
                 if (queryInfo.active !== undefined) return tab.active === queryInfo.active;
                 if (queryInfo.url !== undefined) return tab.url === queryInfo.url;
+                if (queryInfo.currentWindow !== undefined) return tab.windowId === 1; // Mock current window
                 return true;
             });
+        }),
+        get: vi.fn(async (tabId: number) => {
+            const tab = tabs.get(tabId);
+            if (!tab) throw new Error('Tab not found');
+            return tab;
         }),
         sendMessage: vi.fn(async (tabId: number, message: any) => {
             if (!tabs.has(tabId)) throw new Error('Tab not found');
@@ -173,6 +180,7 @@ function createTabsMock() {
             return tab;
         }),
         onUpdated,
+        onActivated,
         // Helper to get internal tabs state
         _tabs: tabs,
     };

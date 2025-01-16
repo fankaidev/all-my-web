@@ -13,6 +13,16 @@ const chromeMock = createChromeMock();
 vi.stubGlobal('chrome', chromeMock);
 
 // Reset mocks before each test
-beforeEach(() => {
+beforeEach(async () => {
     resetChromeMocks(chromeMock);
+
+    // Create a mock active tab
+    const tab = await chromeMock.tabs.create({
+        url: 'https://example.com',
+        active: true,
+        windowId: 1,
+    });
+
+    // Trigger tab activated event
+    chromeMock.tabs.onActivated.trigger({ tabId: tab.id!, windowId: 1 });
 });
