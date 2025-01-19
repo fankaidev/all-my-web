@@ -1,6 +1,15 @@
-@tailwind base;
-@tailwind components;
+/* Only include utilities to avoid affecting page styles */
 @tailwind utilities;
-.your-class {
+
+/* Scope all styles to our container */
+#__root {
+    all: initial;
+    /* Reset all styles for our container */
+    font-family: system-ui, sans-serif;
+    /* Set default font */
+}
+
+/* Keep existing custom styles scoped */
+#__root .your-class {
     color: aliceblue;
 }
