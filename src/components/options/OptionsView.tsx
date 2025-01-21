@@ -1,3 +1,5 @@
+import { LoginButton } from '@/components/auth/LoginButton';
+import { UserProfile } from '@/components/auth/UserProfile';
 import { useLLMSettings } from '@/store/llmSettings';
 import { useEffect, useState } from 'react';
 import Warning from '../Warning';
@@ -45,6 +47,11 @@ export default function OptionsView({ onClose }: { onClose: () => void }) {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </button>
+                    </div>
+
+                    <div className="flex items-center justify-center space-x-4 mb-8">
+                        <UserProfile />
+                        <LoginButton />
                     </div>
 
                     {!settings.apiKey && (

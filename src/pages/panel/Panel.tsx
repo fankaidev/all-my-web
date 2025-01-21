@@ -1,5 +1,3 @@
-import { LoginButton } from '@/components/auth/LoginButton';
-import { UserProfile } from '@/components/auth/UserProfile';
 import OptionsView from '@/components/options/OptionsView';
 import '@pages/panel/Panel.css';
 import { useEffect, useState } from 'react';
@@ -33,11 +31,7 @@ function PanelContent() {
   return (
     <div className="flex flex-col h-screen">
       <header className="bg-white border-b p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <UserProfile />
-            <LoginButton />
-          </div>
+        <div className="flex items-center justify-end">
           <button
             onClick={() => setShowOptions(true)}
             className="p-2 hover:bg-gray-100 rounded-full"
