@@ -19,3 +19,4 @@
 17. Add LLM settings warning in script editor
 18. Refactor script editor UI layout
 19. Add Google login support
+20. Refactor options page into panel
