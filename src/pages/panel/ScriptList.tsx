@@ -52,7 +52,7 @@ const ScriptList: React.FC<ScriptListProps> = ({ scripts, onEdit, onDelete, onTo
     };
 
     return (
-        <div className="flex-1 bg-gray-50 rounded-lg p-2 overflow-y-auto">
+        <div className="flex-1 bg-gray-50 rounded-lg p-4 overflow-y-auto">
             {scripts.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-gray-500">
                     <svg className="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,7 +62,7 @@ const ScriptList: React.FC<ScriptListProps> = ({ scripts, onEdit, onDelete, onTo
                     <p className="text-sm">Click the Add Script button to create one</p>
                 </div>
             ) : (
-                <div className="space-y-3">
+                <div className="space-y-4">
                     {scripts.map(script => {
                         const matched = isScriptMatched(script);
                         return (

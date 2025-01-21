@@ -47,16 +47,6 @@
 - Update OptionsView to use llmSettings store
 - Fix imports and types
 
-[ ] Task 6: Add new tests
-- Add tests for OptionsView component
-  * Test rendering
-  * Test form interactions
-  * Test save functionality
-  * Test close functionality
-- Add tests for Panel with options
-  * Test options toggle
-  * Test integration with OptionsView
-
 ## Test Plan
 * Verify all options functionality works in panel
 * Test navigation between panel and options views

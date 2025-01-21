@@ -8,14 +8,8 @@ export function UserProfile() {
     }
 
     return (
-        <div className="flex items-center space-x-4 p-4 bg-white rounded-lg shadow">
-            <img
-                src={identity.picture}
-                alt={identity.name}
-                className="w-10 h-10 rounded-full"
-            />
+        <div className="flex items-center justify-center space-x-4 px-4">
             <div>
-                <div className="font-medium text-gray-900">{identity.name}</div>
                 <div className="text-sm text-gray-500">{identity.email}</div>
             </div>
         </div>
