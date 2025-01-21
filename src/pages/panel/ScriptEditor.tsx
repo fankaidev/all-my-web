@@ -1,9 +1,10 @@
 import { PageContext } from '@src/utils/pageContext';
 import React, { useEffect, useRef, useState } from 'react';
 import Warning from '../../components/Warning';
+import { useAuthStore } from '../../store/authStore';
 import { useLLMSettings } from '../../store/llmSettings';
 import { Script } from '../../types/script';
-import { useLLM } from '../../utils/llm';
+import { useLLM, useScriptGeneration } from '../../utils/llm';
 import { GEN_SCRIPT_PROMPT } from '../../utils/prompts';
 
 interface ScriptEditorProps {
@@ -25,7 +26,9 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
     const requirementRef = useRef<HTMLTextAreaElement>(null);
     const bodyRef = useRef<HTMLTextAreaElement>(null);
     const { settings, loadSettings } = useLLMSettings();
-    const { generate, generating } = useLLM();
+    const { token } = useAuthStore();
+    const { generate: generateWithLLM, generating: generatingWithLLM } = useLLM();
+    const { generate: generateWithAPI, generating: generatingWithAPI } = useScriptGeneration(token);
     const [error, setError] = useState<string | null>(null);
     const [pageUrl, setPageUrl] = useState<string | null>(null);
 
@@ -61,20 +64,33 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
                 setError('Failed to get page context');
                 return;
             }
-            const prompt = GEN_SCRIPT_PROMPT.replace('{requirement}', requirementRef.current.value)
-                .replace('{context}', JSON.stringify(context));
 
-            const raw = await generate({
-                prompt,
-            });
+            let generatedCode: string;
+            if (settings.apiKey) {
+                // Use OpenAI API
+                const prompt = GEN_SCRIPT_PROMPT.replace('{requirement}', requirementRef.current.value)
+                    .replace('{context}', JSON.stringify(context));
 
-            if (raw.startsWith('```javascript') && raw.endsWith('```')) {
-                const generatedCode = raw.replace(/```javascript\n|```/g, '');
-                if (bodyRef.current) {
-                    bodyRef.current.value = generatedCode;
+                const raw = await generateWithLLM({
+                    prompt,
+                });
+
+                if (raw.startsWith('```javascript') && raw.endsWith('```')) {
+                    generatedCode = raw.replace(/```javascript\n|```/g, '');
+                } else {
+                    setError(raw);
+                    return;
                 }
             } else {
-                setError(raw);
+                // Use script generation API
+                const raw = await generateWithAPI({
+                    user_request: requirementRef.current.value,
+                });
+                generatedCode = raw;
+            }
+
+            if (bodyRef.current) {
+                bodyRef.current.value = generatedCode;
             }
         } catch (err) {
             console.error('Failed to generate script:', err);
@@ -86,18 +102,24 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
         }
     };
 
-    const isLLMConfigured = settings.apiKey && settings.modelName;
+    const isGenerating = generatingWithLLM || generatingWithAPI;
+    const canGenerate = settings.apiKey || token;
 
     return (
         <div className="flex-1 flex flex-col">
             <div className="flex flex-col flex-1">
-                {!isLLMConfigured && (
-                    <Warning type="warning" title="LLM Settings Required">
-                        Please configure LLM settings to use the script generation feature.
+                {!canGenerate && (
+                    <Warning type="warning" title="Script Generation Settings Required">
+                        Please either configure LLM settings or sign in to use the script generation feature.
                         <ol className="list-decimal list-inside mt-2 ml-2">
-                            <li>Click the extension icon and select "Options"</li>
-                            <li>Enter your API Key, API Base URL, and Model Name</li>
-                            <li>Save the settings and return to this page</li>
+                            <li>To use OpenAI API:
+                                <ul className="list-disc list-inside ml-4">
+                                    <li>Click the extension icon and select "Options"</li>
+                                    <li>Enter your API Key, API Base URL, and Model Name</li>
+                                    <li>Save the settings and return to this page</li>
+                                </ul>
+                            </li>
+                            <li>Or simply sign in to use our script generation service</li>
                         </ol>
                     </Warning>
                 )}
@@ -157,11 +179,11 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
                 <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
                     <button
                         onClick={handleGenerate}
-                        disabled={generating || !isLLMConfigured}
-                        className={`px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2 ${(generating || !isLLMConfigured) ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        title={!isLLMConfigured ? "Configure LLM settings first" : "Generate script using AI"}
+                        disabled={isGenerating || !canGenerate}
+                        className={`px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2 ${(isGenerating || !canGenerate) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        title={!canGenerate ? "Configure LLM settings or sign in first" : "Generate script using AI"}
                     >
-                        {generating ? (
+                        {isGenerating ? (
                             <>
                                 <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

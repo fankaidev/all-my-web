@@ -20,3 +20,4 @@
 18. Refactor script editor UI layout
 19. Add Google login support
 20. Refactor options page into panel
+21. Add script generation API integration

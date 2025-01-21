@@ -109,3 +109,78 @@ export function useLLM(): UseLLMResult {
         error,
     };
 }
+
+interface ScriptGenerationResponse {
+    script: string;
+}
+
+interface ScriptGenerationRequest {
+    user_request: string;
+}
+
+/**
+ * Call script generation API to generate script
+ */
+export async function generateScript(request: ScriptGenerationRequest, token: string): Promise<string> {
+    try {
+        const response = await fetch('https://all-my-web-api.cloud6565.workers.dev/script', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify(request),
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error?.message || 'Failed to generate script');
+        }
+
+        const data: ScriptGenerationResponse = await response.json();
+        return data.script;
+    } catch (error) {
+        console.error('Failed to generate script:', error);
+        throw error;
+    }
+}
+
+interface UseScriptGenerationResult {
+    generate: (request: ScriptGenerationRequest) => Promise<string>;
+    generating: boolean;
+    error: string | null;
+}
+
+/**
+ * Hook for calling script generation API
+ */
+export function useScriptGeneration(token: string | null): UseScriptGenerationResult {
+    const [generating, setGenerating] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const generate = async (request: ScriptGenerationRequest): Promise<string> => {
+        if (!token) {
+            throw new Error('Please sign in to use script generation');
+        }
+
+        setGenerating(true);
+        setError(null);
+
+        try {
+            const result = await generateScript(request, token);
+            return result;
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Failed to generate script';
+            setError(message);
+            throw error;
+        } finally {
+            setGenerating(false);
+        }
+    };
+
+    return {
+        generate,
+        generating,
+        error,
+    };
+}
