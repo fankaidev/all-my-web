@@ -21,8 +21,16 @@
     "storage",
     "tabs",
     "windows",
-    "scripting"
+    "scripting",
+    "identity"
   ],
+  "oauth2": {
+    "client_id": "161015229632-rb57ob75bpli0f9dbc8t8i6ot1rviiv8.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/userinfo.profile"
+    ]
+  },
   "host_permissions": [
     "<all_urls>"
   ],

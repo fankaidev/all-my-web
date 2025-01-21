@@ -1,12 +1,12 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
+import '@assets/styles/tailwind.css';
 import Panel from '@pages/panel/Panel';
 import '@pages/panel/index.css';
-import '@assets/styles/tailwind.css';
+import { createRoot } from 'react-dom/client';
 
 function init() {
-  const rootContainer = document.querySelector("#__root");
-  if (!rootContainer) throw new Error("Can't find Panel root element");
+  const rootContainer = document.createElement('div');
+  rootContainer.id = '__root';
+  document.body.appendChild(rootContainer);
   const root = createRoot(rootContainer);
   root.render(<Panel />);
 }

@@ -1,5 +1,29 @@
 # Lessons
 
+## React Component Declarations
+1. Use regular function declarations instead of FC type
+2. Explicitly define props interface when needed
+3. Keep component declarations simple and clear
+
+### Examples
+```typescript
+// Good
+function MyComponent({ name, age }: MyComponentProps) {
+    return <div>{name} is {age} years old</div>;
+}
+
+// Bad - unnecessary FC type
+const MyComponent: FC<MyComponentProps> = ({ name, age }) => {
+    return <div>{name} is {age} years old</div>;
+};
+```
+
+### Reasons
+1. FC type is redundant with modern TypeScript
+2. Regular functions are more straightforward and easier to read
+3. Props interface provides better type checking than FC
+4. Consistent with React team's recommendations
+
 ## Logging Practices
 1. Always add abundant debug logs to help troubleshooting
 2. All log messages should start with '[amw]' (project prefix) for easy filtering

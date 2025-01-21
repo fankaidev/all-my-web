@@ -18,3 +18,4 @@
 16. Add developer mode warning message
 17. Add LLM settings warning in script editor
 18. Refactor script editor UI layout
+19. Add Google login support

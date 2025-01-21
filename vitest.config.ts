@@ -1,7 +1,8 @@
 /// <reference types="vitest" />
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { resolve } from 'path';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
     plugins: [react(), tsconfigPaths()],
@@ -20,6 +21,11 @@ export default defineConfig({
                 '**/*.config.{js,ts}',
                 '**/dist/**',
             ],
+        },
+    },
+    resolve: {
+        alias: {
+            '@': resolve(__dirname, './src'),
         },
     },
 });

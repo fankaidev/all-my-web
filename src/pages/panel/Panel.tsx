@@ -1,3 +1,5 @@
+import { LoginButton } from '@/components/auth/LoginButton';
+import { UserProfile } from '@/components/auth/UserProfile';
 import '@pages/panel/Panel.css';
 import { useEffect } from 'react';
 import { Route, BrowserRouter as Router, Routes, useNavigate, useParams } from 'react-router-dom';
@@ -18,7 +20,6 @@ function PanelContent() {
   }, [loadScripts]);
 
   useEffect(() => {
-    // Check developer mode status on mount and periodically when disabled
     checkDevModeEnabled();
   }, [checkDevModeEnabled]);
 
@@ -27,59 +28,76 @@ function PanelContent() {
     navigate(`/edit/${newScript.id}`);
   };
 
-  if (isLoading) {
-    return <div className="flex-1 flex items-center justify-center">Loading scripts...</div>;
-  }
-
-  if (error) {
-    return <div className="flex-1 flex items-center justify-center text-red-500">{error}</div>;
-  }
-
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="container mx-auto px-2 py-2 h-screen flex flex-col">
-        {!isDevModeEnabled && (
-          <Warning type="error" title="Developer Mode Required">
-            Please enable Developer Mode in chrome://extensions to use user scripts.
-            <ol className="list-decimal list-inside mt-2 ml-2">
-              <li>Open chrome://extensions in a new tab</li>
-              <li>Enable "Developer mode" in the top right corner</li>
-              <li>Reload this extension</li>
-            </ol>
-          </Warning>
-        )}
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-lg font-semibold text-gray-700">Script Manager</h2>
-                  <button
-                    onClick={handleAddScript}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    Add Script
-                  </button>
-                </div>
-                <ScriptList
-                  scripts={scripts}
-                  onEdit={(id) => navigate(`/edit/${id}`)}
-                  onDelete={deleteScript}
-                  onTogglePause={togglePause}
+    <div className="flex flex-col h-screen">
+      <header className="bg-white border-b p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <UserProfile />
+            <LoginButton />
+          </div>
+        </div>
+      </header>
+      <main className="flex-1 overflow-auto p-4">
+        {isLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
+              <span>Loading scripts...</span>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="flex items-center justify-center h-full text-red-500">
+            {error}
+          </div>
+        ) : (
+          <div className="min-h-screen bg-gray-100">
+            <div className="container mx-auto px-2 py-2 h-screen flex flex-col">
+              {!isDevModeEnabled && (
+                <Warning type="error" title="Developer Mode Required">
+                  Please enable Developer Mode in chrome://extensions to use user scripts.
+                  <ol className="list-decimal list-inside mt-2 ml-2">
+                    <li>Open chrome://extensions in a new tab</li>
+                    <li>Enable "Developer mode" in the top right corner</li>
+                    <li>Reload this extension</li>
+                  </ol>
+                </Warning>
+              )}
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <>
+                      <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-lg font-semibold text-gray-700">Script Manager</h2>
+                        <button
+                          onClick={handleAddScript}
+                          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                          Add Script
+                        </button>
+                      </div>
+                      <ScriptList
+                        scripts={scripts}
+                        onEdit={(id) => navigate(`/edit/${id}`)}
+                        onDelete={deleteScript}
+                        onTogglePause={togglePause}
+                      />
+                    </>
+                  }
                 />
-              </>
-            }
-          />
-          <Route
-            path="/edit/:id"
-            element={<EditRoute scripts={scripts} editScript={editScript} />}
-          />
-        </Routes>
-      </div>
+                <Route
+                  path="/edit/:id"
+                  element={<EditRoute scripts={scripts} editScript={editScript} />}
+                />
+              </Routes>
+            </div>
+          </div>
+        )}
+      </main>
     </div>
   );
 }

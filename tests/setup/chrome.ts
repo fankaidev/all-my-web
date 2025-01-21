@@ -189,6 +189,16 @@ export function createChromeMock() {
             setBadgeBackgroundColor: vi.fn(),
             onClicked: createEventHandler()
         },
+        identity: {
+            getAuthToken: vi.fn((details, callback) => {
+                chrome.runtime.lastError = undefined;
+                callback('mock-token');
+            }),
+            removeCachedAuthToken: vi.fn((details, callback) => {
+                chrome.runtime.lastError = undefined;
+                callback();
+            }),
+        } as unknown as typeof chrome.identity,
     };
 }
 
