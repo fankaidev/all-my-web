@@ -35,15 +35,24 @@
 - Remove options-related test files
 - Update build configuration if needed
 
-[ ] Task 4: Add new tests
+[X] Task 4: Update implementation
+- Add API Base URL field
+- Add Model Name field
+- Add validation and error handling
+- Add privacy policy link
+- Fix styling to match previous design
+
+[X] Task 5: Fix store implementation
+- Remove redundant llmStore.ts
+- Update OptionsView to use llmSettings store
+- Fix imports and types
+
+[ ] Task 6: Add new tests
 - Add tests for OptionsView component
   * Test rendering
   * Test form interactions
   * Test save functionality
   * Test close functionality
-- Add tests for LLM store
-  * Test settings persistence
-  * Test settings update
 - Add tests for Panel with options
   * Test options toggle
   * Test integration with OptionsView

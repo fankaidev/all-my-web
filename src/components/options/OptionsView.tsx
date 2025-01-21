@@ -1,24 +1,17 @@
-import useLLMStore from '@/store/llmStore';
-import { ValidationError } from '@/types/llm';
+import { useLLMSettings } from '@/store/llmSettings';
 import { useEffect, useState } from 'react';
 import Warning from '../Warning';
 
 export default function OptionsView({ onClose }: { onClose: () => void }) {
-    const { settings, saveStatus, validationErrors, updateSettings } = useLLMStore();
+    const { settings, saveStatus, validationErrors, setSettings, saveSettings } = useLLMSettings();
     const [apiKey, setApiKey] = useState(settings.apiKey || '');
     const [apiBase, setApiBase] = useState(settings.apiBase || 'https://api.openai.com/v1');
     const [modelName, setModelName] = useState(settings.modelName || 'deepseek-chat');
-    const [model, setModel] = useState(settings.model || 'gpt-3.5-turbo');
-    const [temperature, setTemperature] = useState(settings.temperature?.toString() || '0.7');
-    const [maxTokens, setMaxTokens] = useState(settings.maxTokens?.toString() || '2000');
 
     useEffect(() => {
         setApiKey(settings.apiKey || '');
         setApiBase(settings.apiBase || 'https://api.openai.com/v1');
         setModelName(settings.modelName || 'deepseek-chat');
-        setModel(settings.model || 'gpt-3.5-turbo');
-        setTemperature(settings.temperature?.toString() || '0.7');
-        setMaxTokens(settings.maxTokens?.toString() || '2000');
     }, [settings]);
 
     const getFieldError = (fieldName: string) => {
@@ -26,14 +19,15 @@ export default function OptionsView({ onClose }: { onClose: () => void }) {
     };
 
     const handleSave = async () => {
-        await updateSettings({
+        setSettings({
             apiKey,
             apiBase,
             modelName,
-            model,
-            temperature: parseFloat(temperature),
-            maxTokens: parseInt(maxTokens),
         });
+        await saveSettings();
+        if (saveStatus === 'saved') {
+            onClose();
+        }
     };
 
     return (
@@ -114,53 +108,6 @@ export default function OptionsView({ onClose }: { onClose: () => void }) {
                                 <p className="mt-2 text-sm text-red-600">{getFieldError('modelName')}</p>
                             )}
                         </div>
-
-                        <div>
-                            <label htmlFor="model" className="block text-sm font-medium text-gray-700">
-                                OpenAI Model
-                            </label>
-                            <select
-                                id="model"
-                                value={model}
-                                onChange={(e) => setModel(e.target.value)}
-                                className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            >
-                                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                                <option value="gpt-4">GPT-4</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label htmlFor="temperature" className="block text-sm font-medium text-gray-700">
-                                Temperature
-                            </label>
-                            <input
-                                type="number"
-                                id="temperature"
-                                value={temperature}
-                                onChange={(e) => setTemperature(e.target.value)}
-                                min="0"
-                                max="2"
-                                step="0.1"
-                                className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="maxTokens" className="block text-sm font-medium text-gray-700">
-                                Max Tokens
-                            </label>
-                            <input
-                                type="number"
-                                id="maxTokens"
-                                value={maxTokens}
-                                onChange={(e) => setMaxTokens(e.target.value)}
-                                min="1"
-                                max="4000"
-                                step="1"
-                                className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                            />
-                        </div>
                     </div>
 
                     <div className="flex justify-end space-x-4 mt-6">
@@ -195,7 +142,7 @@ export default function OptionsView({ onClose }: { onClose: () => void }) {
                         <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-800 text-sm font-medium rounded-lg">
                             <p className="text-center mb-2">Please fix the following errors:</p>
                             <ul className="list-disc list-inside">
-                                {validationErrors.map((error: ValidationError, index: number) => (
+                                {validationErrors.map((error, index) => (
                                     <li key={index}>{error.message}</li>
                                 ))}
                             </ul>
