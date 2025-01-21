@@ -89,8 +89,8 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
     const isLLMConfigured = settings.apiKey && settings.modelName;
 
     return (
-        <div className="flex-1 bg-gray-50 rounded-lg p-2">
-            <div className="bg-white p-2 rounded-lg border border-gray-200 shadow-sm flex flex-col h-full">
+        <div className="flex-1 flex flex-col">
+            <div className="flex flex-col flex-1">
                 {!isLLMConfigured && (
                     <Warning type="warning" title="LLM Settings Required">
                         Please configure LLM settings to use the script generation feature.
@@ -135,11 +135,11 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Script Body
                         </label>
-                        <div className="flex-1 min-h-0">
+                        <div className="flex-1 relative">
                             <textarea
                                 ref={bodyRef}
                                 defaultValue={script.body}
-                                className="w-full h-full resize-none p-2 font-mono text-sm text-gray-600 bg-gray-50 rounded border focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                className="absolute inset-0 w-full h-full resize-none p-2 font-mono text-sm text-gray-600 bg-gray-50 rounded border focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                                 onKeyDown={(e) => {
                                     if (e.key === 'Escape') {
                                         onCancel();

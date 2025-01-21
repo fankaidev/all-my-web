@@ -40,8 +40,8 @@ function PanelContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="container mx-auto p-2 h-screen flex flex-col">
+    <div className="min-h-screen h-screen bg-gray-100">
+      <div className="container mx-auto p-2 h-full flex flex-col">
         {showOptions ? (
           <OptionsView onClose={() => setShowOptions(false)} />
         ) : isLoading ? (
@@ -56,9 +56,9 @@ function PanelContent() {
             {error}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="bg-white rounded-lg shadow-sm p-4 flex flex-col flex-1">
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-semibold text-gray-900">Script Manager</h1>
+              <h1 className="text-2xl font-semibold text-gray-900">All My Web</h1>
               <button
                 onClick={() => setShowOptions(true)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
