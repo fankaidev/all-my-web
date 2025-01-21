@@ -74,7 +74,7 @@ export const getUserInfo = async (token: string): Promise<Identity> => {
         };
     } catch (error) {
         console.error('[auth] Error fetching user info:', error);
-        throw error;
+        throw new Error('Failed to fetch user info');
     }
 };
 

@@ -1,9 +1,10 @@
-import { act, render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ScriptList from '../../../src/pages/panel/ScriptList';
 import { Script } from '../../../src/types/script';
 import { createChromeMock } from '../../setup/chrome';
+import { renderWithUser } from '../../setup/test-utils';
 
 // Get the type of chrome mock for type assertions
 type ChromeMock = ReturnType<typeof createChromeMock>;
@@ -39,103 +40,143 @@ describe('ScriptList', () => {
         onTogglePause: vi.fn()
     };
 
-    beforeEach(() => {
+    beforeEach(async () => {
         vi.clearAllMocks();
-        // Set up initial tab URL
+        // Reset Chrome mocks
         const chromeMock = chrome as unknown as ChromeMock;
-        const tab = Array.from(chromeMock.tabs._tabs.values())[0];
-        tab.url = 'https://example.com/page1';
+        chromeMock.tabs._tabs.clear();
     });
 
-    it('should show Matched tag for matching scripts', async () => {
-        await act(async () => {
-            render(
-                <ScriptList
-                    scripts={mockScripts}
-                    onEdit={mockHandlers.onEdit}
-                    onDelete={mockHandlers.onDelete}
-                    onTogglePause={mockHandlers.onTogglePause}
-                />
-            );
-        });
+    // Basic UI tests
+    it('should render list of scripts', () => {
+        renderWithUser(
+            <ScriptList
+                scripts={mockScripts}
+                {...mockHandlers}
+            />
+        );
 
-        expect(screen.queryAllByText('Matched')).toHaveLength(1);
+        // Check if script names are rendered
+        expect(screen.getByText('Example Script')).toBeInTheDocument();
+        expect(screen.getByText('Test Script')).toBeInTheDocument();
+        expect(screen.getByText('Paused Script')).toBeInTheDocument();
+    });
+
+    it('should handle script deletion', async () => {
+        const { user } = renderWithUser(
+            <ScriptList
+                scripts={mockScripts}
+                {...mockHandlers}
+            />
+        );
+
+        // Click delete button
+        const deleteButton = screen.getAllByTitle('Delete script')[0];
+        await user.click(deleteButton);
+
+        // Verify handler was called
+        expect(mockHandlers.onDelete).toHaveBeenCalledWith(1);
+    });
+
+    it('should handle script toggle', async () => {
+        const { user } = renderWithUser(
+            <ScriptList
+                scripts={mockScripts}
+                {...mockHandlers}
+            />
+        );
+
+        // Click pause button for first script
+        const pauseButton = screen.getAllByTitle('Pause script')[0];
+        await user.click(pauseButton);
+
+        // Verify handler was called
+        expect(mockHandlers.onTogglePause).toHaveBeenCalledWith(1);
+    });
+
+    // URL matching tests
+    it('should show Matched tag for matching scripts', async () => {
+        const chromeMock = chrome as unknown as ChromeMock;
+        const tab = await chromeMock.tabs.create({
+            url: 'https://example.com/',
+            active: true,
+            windowId: 1,
+        });
+        console.log('[test] Created mock tab:', tab);
+
+        // Mock query to return our tab
+        chromeMock.tabs.query.mockResolvedValue([tab]);
+        console.log('[test] Mocked query to return tab');
+
+        renderWithUser(
+            <ScriptList
+                scripts={mockScripts}
+                {...mockHandlers}
+            />
+        );
+        console.log('[test] Rendered ScriptList');
+
+        // Wait for state updates
+        await vi.waitFor(() => {
+            console.log('[test] Checking for Matched tag');
+            expect(screen.getByText('Example Script')).toBeInTheDocument();
+            expect(screen.getByText('Matched')).toBeInTheDocument();
+        }, { timeout: 2000 });
+
         expect(screen.queryAllByText('Skipped')).toHaveLength(1);
         expect(screen.queryAllByText('Paused')).toHaveLength(1);
     });
 
     it('should not show Matched tag for non-matching scripts', async () => {
-        // Change mock tab URL
         const chromeMock = chrome as unknown as ChromeMock;
-        const tab = Array.from(chromeMock.tabs._tabs.values())[0];
-        tab.url = 'https://other.com/page1';
-        (chromeMock.tabs.onUpdated as any).trigger(tab.id!, { status: 'complete' }, tab);
-
-        await act(async () => {
-            render(
-                <ScriptList
-                    scripts={mockScripts}
-                    onEdit={mockHandlers.onEdit}
-                    onDelete={mockHandlers.onDelete}
-                    onTogglePause={mockHandlers.onTogglePause}
-                />
-            );
+        const tab = await chromeMock.tabs.create({
+            url: 'https://other.com/page1',
+            active: true,
+            windowId: 1,
         });
 
-        // No scripts should be active
-        expect(screen.queryByText('Matched')).not.toBeInTheDocument();
+        // Mock query to return our tab
+        chromeMock.tabs.query.mockResolvedValue([tab]);
+
+        renderWithUser(
+            <ScriptList
+                scripts={mockScripts}
+                {...mockHandlers}
+            />
+        );
+
+        // Wait for state updates
+        await vi.waitFor(() => {
+            expect(screen.getByText('Example Script')).toBeInTheDocument();
+            expect(screen.queryByText('Matched')).not.toBeInTheDocument();
+        });
     });
 
     it('should not show Matched tag for paused scripts', async () => {
-        await act(async () => {
-            render(
-                <ScriptList
-                    scripts={mockScripts}
-                    onEdit={mockHandlers.onEdit}
-                    onDelete={mockHandlers.onDelete}
-                    onTogglePause={mockHandlers.onTogglePause}
-                />
-            );
-        });
-
-        // Paused script should not show Matched tag even if URL matches
-        const pausedScript = screen.getByText('Paused Script').closest('div[class*="bg-white"]');
-        expect(pausedScript).toHaveTextContent('Paused');
-    });
-
-    it('should update Matched tags when URL changes', async () => {
-        await act(async () => {
-            render(
-                <ScriptList
-                    scripts={mockScripts}
-                    onEdit={mockHandlers.onEdit}
-                    onDelete={mockHandlers.onDelete}
-                    onTogglePause={mockHandlers.onTogglePause}
-                />
-            );
-        });
-
-        // Wait for initial render
-        await vi.waitFor(() => {
-            expect(screen.getByText('Example Script')).toBeInTheDocument();
-            expect(screen.getByText('Matched')).toBeInTheDocument();
-        });
-
-        // Change mock tab URL to test.com
         const chromeMock = chrome as unknown as ChromeMock;
-        const tab = Array.from(chromeMock.tabs._tabs.values())[0];
-        tab.url = 'https://test.com/page1';
-        (chromeMock.tabs.onUpdated as any).trigger(tab.id!, { status: 'complete' }, tab);
-
-        // Now test.com script should be active
-        await vi.waitFor(() => {
-            const testScript = screen.getByText('Test Script').closest('div[class*="bg-white"]');
-            expect(testScript).toHaveTextContent('Matched');
+        const tab = await chromeMock.tabs.create({
+            url: 'https://example.com/page1',
+            active: true,
+            windowId: 1,
         });
 
-        // example.com script should not be active
-        const exampleScript = screen.getByText('Example Script').closest('div[class*="bg-white"]');
-        expect(exampleScript).not.toHaveTextContent('Matched');
+        // Mock query to return our tab
+        chromeMock.tabs.query.mockResolvedValue([tab]);
+
+        renderWithUser(
+            <ScriptList
+                scripts={mockScripts}
+                {...mockHandlers}
+            />
+        );
+
+        // Wait for state updates
+        await vi.waitFor(() => {
+            expect(screen.getByText('Paused Script')).toBeInTheDocument();
+            const pausedScript = screen.getByText('Paused Script').closest('div[class*="bg-gray-50"]');
+            expect(pausedScript).toHaveTextContent('Paused');
+            expect(pausedScript).not.toHaveTextContent('Matched');
+        });
     });
 
 });

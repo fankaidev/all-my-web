@@ -17,21 +17,26 @@ const ScriptList: React.FC<ScriptListProps> = ({ scripts, onEdit, onDelete, onTo
     useEffect(() => {
         const updateCurrentUrl = async () => {
             const tab = await getCurrentTab();
+            console.log('[ScriptList] Got current tab:', tab);
             setCurrentUrl(tab?.url || null);
+            console.log('[ScriptList] Updated URL to:', tab?.url || null);
         };
 
         // Initial URL
+        console.log('[ScriptList] Running initial URL update');
         updateCurrentUrl();
 
         // Listen for tab changes
         const tabUpdateListener = (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) => {
             if (changeInfo.status === 'complete' && tab.active) {
+                console.log('[ScriptList] Tab updated:', tab);
                 updateCurrentUrl();
             }
         };
 
         const tabActivatedListener = async (activeInfo: chrome.tabs.TabActiveInfo) => {
             const tab = await chrome.tabs.get(activeInfo.tabId);
+            console.log('[ScriptList] Tab activated:', tab);
             setCurrentUrl(tab.url || null);
         };
 
@@ -45,10 +50,40 @@ const ScriptList: React.FC<ScriptListProps> = ({ scripts, onEdit, onDelete, onTo
     }, []);
 
     // Check if a script matches the current URL
-    const isScriptMatched = (script: Script): boolean => {
-        if (!currentUrl || script.isPaused) return false;
+    const isScriptMatched = (script: Script, currentUrl: string | null) => {
+        if (!currentUrl || script.isPaused) {
+            return false;
+        }
+
+        console.log('[ScriptList] Checking if script matches:', {
+            scriptName: script.name,
+            currentUrl,
+            isPaused: script.isPaused
+        });
+
         const patterns = extractMatchPatterns(script.body);
-        return patterns.some(pattern => currentUrl.match(pattern.replace(/\*/g, '.*')));
+        console.log('[ScriptList] Extracted patterns:', patterns);
+
+        return patterns.some(pattern => {
+            // Convert match pattern to regex pattern
+            let regexPattern = pattern
+                .replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // Escape special regex chars
+                .replace(/\\\*/g, '.*'); // Convert * back to .*
+
+            // Handle URLs with or without path
+            if (regexPattern.endsWith('/.*')) {
+                regexPattern = regexPattern.slice(0, -3) + '(?:/.*)?';
+            }
+
+            const regex = new RegExp(`^${regexPattern}$`);
+            console.log('[ScriptList] Testing pattern:', {
+                pattern,
+                regexPattern,
+                regex: regex.toString(),
+                matches: regex.test(currentUrl)
+            });
+            return regex.test(currentUrl);
+        });
     };
 
     return (
@@ -64,7 +99,7 @@ const ScriptList: React.FC<ScriptListProps> = ({ scripts, onEdit, onDelete, onTo
             ) : (
                 <div className="space-y-4 overflow-y-auto flex-1">
                     {scripts.map(script => {
-                        const matched = isScriptMatched(script);
+                        const matched = isScriptMatched(script, currentUrl);
                         return (
                             <div
                                 key={script.id}
