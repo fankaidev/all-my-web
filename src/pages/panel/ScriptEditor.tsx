@@ -4,7 +4,7 @@ import Warning from '../../components/Warning';
 import { useAuthStore } from '../../store/authStore';
 import { useLLMSettings } from '../../store/llmSettings';
 import { Script } from '../../types/script';
-import { useLLM, useScriptGeneration } from '../../utils/llm';
+import { useLLM, useScriptGenerationApi } from '../../utils/llm';
 import { GEN_SCRIPT_PROMPT } from '../../utils/prompts';
 
 interface ScriptEditorProps {
@@ -28,7 +28,7 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
     const { settings, loadSettings } = useLLMSettings();
     const { token } = useAuthStore();
     const { generate: generateWithLLM, generating: generatingWithLLM } = useLLM();
-    const { generate: generateWithAPI, generating: generatingWithAPI } = useScriptGeneration(token);
+    const { generate: generateWithAPI, generating: generatingWithAPI } = useScriptGenerationApi(token);
     const [error, setError] = useState<string | null>(null);
     const [pageUrl, setPageUrl] = useState<string | null>(null);
 
@@ -65,30 +65,20 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
                 return;
             }
 
-            let generatedCode: string;
+
+            let raw: string;
             if (settings.apiKey) {
-                // Use OpenAI API
                 const prompt = GEN_SCRIPT_PROMPT.replace('{requirement}', requirementRef.current.value)
                     .replace('{context}', JSON.stringify(context));
-
-                const raw = await generateWithLLM({
-                    prompt,
-                });
-
-                if (raw.startsWith('```javascript') && raw.endsWith('```')) {
-                    generatedCode = raw.replace(/```javascript\n|```/g, '');
-                } else {
-                    setError(raw);
-                    return;
-                }
+                raw = await generateWithLLM({ prompt });
             } else {
-                // Use script generation API
-                const raw = await generateWithAPI({
-                    user_request: requirementRef.current.value,
-                });
-                generatedCode = raw;
+                raw = await generateWithAPI({ user_request: requirementRef.current.value, context });
             }
-
+            if (!raw.includes('```javascript')) {
+                setError("invalid generation result: \n" + raw);
+                return;
+            }
+            const generatedCode = raw.slice(raw.indexOf('```javascript') + 13, raw.lastIndexOf('```')).trim();
             if (bodyRef.current) {
                 bodyRef.current.value = generatedCode;
             }
@@ -150,7 +140,7 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
                             ref={requirementRef}
                             defaultValue={script.requirement}
                             className="w-full h-24 p-2 font-mono text-sm text-gray-600 bg-gray-50 rounded border focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                            placeholder="Describe what you want this script to do, and then click Generate to generate the script."
+                            placeholder="Describe what you want this script to do, and then click Generate to generate the script. Example: display current time"
                         />
                     </div>
                     <div className="flex flex-col flex-1 min-h-0">
@@ -162,6 +152,7 @@ const ScriptEditor: React.FC<ScriptEditorProps> = ({ script, onSave, onCancel })
                                 ref={bodyRef}
                                 defaultValue={script.body}
                                 className="absolute inset-0 w-full h-full resize-none p-2 font-mono text-sm text-gray-600 bg-gray-50 rounded border focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                placeholder="Generated script will be displayed here."
                                 onKeyDown={(e) => {
                                     if (e.key === 'Escape') {
                                         onCancel();

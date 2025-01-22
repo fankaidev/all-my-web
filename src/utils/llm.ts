@@ -47,8 +47,8 @@ async function chatCompletions(request: ChatCompletionRequest, settings: LLMSett
             body: JSON.stringify({
                 model: request.model || settings.modelName,
                 messages,
-                max_tokens: request.max_tokens ?? 1000,
-                temperature: request.temperature ?? 0.7,
+                max_tokens: request.max_tokens ?? 1024,
+                temperature: request.temperature ?? 0.3,
                 top_p: request.top_p ?? 1,
                 frequency_penalty: request.frequency_penalty ?? 0,
                 presence_penalty: request.presence_penalty ?? 0,
@@ -116,6 +116,8 @@ interface ScriptGenerationResponse {
 
 interface ScriptGenerationRequest {
     user_request: string;
+
+    context: any;
 }
 
 /**
@@ -134,7 +136,7 @@ export async function generateScript(request: ScriptGenerationRequest, token: st
 
         if (!response.ok) {
             const error = await response.json();
-            throw new Error(error.error?.message || 'Failed to generate script');
+            throw new Error(error.error || 'Failed to generate script');
         }
 
         const data: ScriptGenerationResponse = await response.json();
@@ -154,7 +156,7 @@ interface UseScriptGenerationResult {
 /**
  * Hook for calling script generation API
  */
-export function useScriptGeneration(token: string | null): UseScriptGenerationResult {
+export function useScriptGenerationApi(token: string | null): UseScriptGenerationResult {
     const [generating, setGenerating] = useState(false);
     const [error, setError] = useState<string | null>(null);
 

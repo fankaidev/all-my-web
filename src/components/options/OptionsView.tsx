@@ -1,4 +1,5 @@
 import { LoginButton } from '@/components/auth/LoginButton';
+import { useAuthStore } from '@/store/authStore';
 import { useLLMSettings } from '@/store/llmSettings';
 import { useEffect, useState } from 'react';
 import Warning from '../Warning';
@@ -9,12 +10,34 @@ export default function OptionsView({ onClose }: { onClose: () => void }) {
     const [apiKey, setApiKey] = useState(settings.apiKey || '');
     const [apiBase, setApiBase] = useState(settings.apiBase || 'https://api.openai.com/v1');
     const [modelName, setModelName] = useState(settings.modelName || 'deepseek-chat');
+    const { isAuthenticated, token } = useAuthStore();
+    const [remainingQuota, setRemainingQuota] = useState<number | null>(null);
 
     useEffect(() => {
         setApiKey(settings.apiKey || '');
         setApiBase(settings.apiBase || 'https://api.openai.com/v1');
         setModelName(settings.modelName || 'deepseek-chat');
     }, [settings]);
+
+    useEffect(() => {
+        // Fetch quota when authenticated and no API key set
+        if (isAuthenticated && !settings.apiKey && token) {
+            fetch('https://all-my-web-api.cloud6565.workers.dev/quota', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if ('remainingQuota' in data) {
+                        setRemainingQuota(data.remainingQuota);
+                    }
+                })
+                .catch(err => {
+                    console.error('Failed to fetch quota:', err);
+                });
+        }
+    }, [isAuthenticated, settings.apiKey, token]);
 
     const getFieldError = (fieldName: string) => {
         return validationErrors.find(error => error.field === fieldName)?.message;
@@ -41,10 +64,27 @@ export default function OptionsView({ onClose }: { onClose: () => void }) {
                         <LoginButton />
                     </div>
 
-                    {!settings.apiKey && (
+                    {!settings.apiKey && !isAuthenticated && (
                         <div className="mb-4">
-                            <Warning type="warning" title="API Key Required">
-                                Please set your OpenAI API key to use AI-powered features.
+                            <Warning type="warning" title="API Key or Login Required">
+                                Please set your own LLM API key to use AI-powered script generation.
+                                Otherwise, you could login to enjoy 20 free generations each month.
+                            </Warning>
+                        </div>
+                    )}
+
+                    {!settings.apiKey && isAuthenticated && remainingQuota !== null && (
+                        <div className="mb-4">
+                            <Warning type="info" title="Free Generations">
+                                {`Your LLM API key is not set. You have ${remainingQuota} free generations remaining this month.`}
+                            </Warning>
+                        </div>
+                    )}
+
+                    {settings.apiKey && (
+                        <div className="mb-4">
+                            <Warning type="info" title="API Key Set">
+                                {`Your LLM API will be used for script generation. No data will be sent to All My Web server.`}
                             </Warning>
                         </div>
                     )}
@@ -89,7 +129,7 @@ export default function OptionsView({ onClose }: { onClose: () => void }) {
 
                         <div>
                             <label htmlFor="modelName" className="block text-base font-medium text-gray-900 mb-2">
-                                Model Name
+                                Model
                             </label>
                             <input
                                 type="text"
@@ -111,7 +151,7 @@ export default function OptionsView({ onClose }: { onClose: () => void }) {
                             onClick={onClose}
                             className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                         >
-                            Cancel
+                            Close
                         </button>
                         <button
                             onClick={handleSave}

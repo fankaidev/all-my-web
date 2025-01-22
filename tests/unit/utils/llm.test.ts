@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { generateScript, useScriptGeneration } from '../../../src/utils/llm';
+import { generateScript, useScriptGenerationApi } from '../../../src/utils/llm';
 
 describe('generateScript', () => {
     const mockToken = 'test-token';
@@ -73,7 +73,7 @@ describe('useScriptGeneration', () => {
     });
 
     it('should return initial state', () => {
-        const { result } = renderHook(() => useScriptGeneration(mockToken));
+        const { result } = renderHook(() => useScriptGenerationApi(mockToken));
 
         expect(result.current.generating).toBe(false);
         expect(result.current.error).toBe(null);
@@ -86,7 +86,7 @@ describe('useScriptGeneration', () => {
             json: () => Promise.resolve(mockResponse),
         });
 
-        const { result } = renderHook(() => useScriptGeneration(mockToken));
+        const { result } = renderHook(() => useScriptGenerationApi(mockToken));
 
         let scriptResult: string | undefined;
         await act(async () => {
@@ -99,7 +99,7 @@ describe('useScriptGeneration', () => {
     });
 
     it('should handle error when token is not provided', async () => {
-        const { result } = renderHook(() => useScriptGeneration(null));
+        const { result } = renderHook(() => useScriptGenerationApi(null));
 
         await expect(result.current.generate(mockRequest)).rejects.toThrow('Please sign in to use script generation');
     });
@@ -111,7 +111,7 @@ describe('useScriptGeneration', () => {
             json: () => Promise.resolve({ error: { message: errorMessage } }),
         });
 
-        const { result } = renderHook(() => useScriptGeneration(mockToken));
+        const { result } = renderHook(() => useScriptGenerationApi(mockToken));
 
         await act(async () => {
             await expect(result.current.generate(mockRequest)).rejects.toThrow(errorMessage);

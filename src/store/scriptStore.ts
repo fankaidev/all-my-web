@@ -60,9 +60,9 @@ const useScriptStore = create<ScriptState>((set, get) => ({
             const { scripts } = get();
             const newScript: Script = {
                 id: scripts.length ? scripts[scripts.length - 1].id + 1 : 1,
-                name: 'New Script',
+                name: 'Script - ' + new Date().toLocaleDateString(),
                 requirement: '',
-                body: 'console.log("hello")',
+                body: '',
                 isPaused: false,
             };
             const updatedScripts = [...scripts, newScript];

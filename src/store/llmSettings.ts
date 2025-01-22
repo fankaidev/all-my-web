@@ -15,38 +15,8 @@ interface LLMSettingsState {
     setSettings: (settings: Partial<LLMSettings>) => void;
     saveSettings: () => Promise<void>;
     loadSettings: () => Promise<void>;
-    validateSettings: () => ValidationError[];
 }
 
-function validateApiKey(apiKey: string): string | null {
-    if (!apiKey) {
-        return 'API Key is required';
-    }
-
-    return null;
-}
-
-function validateApiBase(apiBase: string): string | null {
-    if (!apiBase) {
-        return 'API Base URL is required';
-    }
-    try {
-        new URL(apiBase);
-    } catch {
-        return 'Invalid URL format';
-    }
-    if (!apiBase.startsWith('http://') && !apiBase.startsWith('https://')) {
-        return 'URL must start with http:// or https://';
-    }
-    return null;
-}
-
-function validateModelName(modelName: string): string | null {
-    if (!modelName) {
-        return 'Model name is required';
-    }
-    return null;
-}
 
 export const useLLMSettings = create<LLMSettingsState>((set, get) => ({
     settings: {
@@ -57,29 +27,6 @@ export const useLLMSettings = create<LLMSettingsState>((set, get) => ({
     saveStatus: 'idle',
     isLoading: false,
     validationErrors: [],
-
-    validateSettings: () => {
-        const { settings } = get();
-        const errors: ValidationError[] = [];
-
-        const apiKeyError = validateApiKey(settings.apiKey);
-        if (apiKeyError) {
-            errors.push({ field: 'apiKey', message: apiKeyError });
-        }
-
-        const apiBaseError = validateApiBase(settings.apiBase);
-        if (apiBaseError) {
-            errors.push({ field: 'apiBase', message: apiBaseError });
-        }
-
-        const modelNameError = validateModelName(settings.modelName);
-        if (modelNameError) {
-            errors.push({ field: 'modelName', message: modelNameError });
-        }
-
-        set({ validationErrors: errors });
-        return errors;
-    },
 
     setSettings: (newSettings) => {
         set((state) => ({
@@ -92,15 +39,6 @@ export const useLLMSettings = create<LLMSettingsState>((set, get) => ({
     },
 
     saveSettings: async () => {
-        const errors = get().validateSettings();
-        if (errors.length > 0) {
-            set({ saveStatus: 'error' });
-            setTimeout(() => {
-                set({ saveStatus: 'idle' });
-            }, 2000);
-            return;
-        }
-
         set({ saveStatus: 'saving' });
         try {
             await saveLLMSettings(get().settings);
