@@ -1,54 +1,50 @@
 # Privacy Policy for All My Web Extension
 
 ## Introduction
-All My Web is a browser extension that helps users manage and automate their web browsing experience through user scripts. We take your privacy seriously and want to be transparent about what data we collect and how we use it.
+All My Web is a browser extension that helps users manage and automate their web browsing experience through user scripts. We take your privacy seriously and want to be transparent about how we handle your data.
 
-Please note this extension full works inside your browser, and does not communicate with our server at all.
-All your data collected as listed below will be stored locally in your browser, and will not be shared with any third parties.
+We DO NOT collect any data unless you explicitly opt to use the free generation feature.
 
-## Data Collection and Usage
+## Data Storage and Usage
 
 ### 1. User Scripts
-- **What we collect**: JavaScript code and metadata (name, match patterns) that you create or edit
-- **How we use it**: To execute your scripts on matching web pages
-- **Where it's stored**: Locally on your device using chrome.storage.local
-- **Retention**: Until you delete the scripts or uninstall the extension
-- **Sharing**: Scripts are never transmitted to our servers or shared with third parties
-
-### 2. LLM Settings
-- **What we collect**: API key and base URL for AI services
-- **How we use it**: To provide AI-powered script generation features
+- **What it is**: JavaScript code and metadata (name, match patterns) that you create or edit
+- **How it works**: Your scripts are executed on matching web pages
 - **Where it's stored**: In chrome.storage.sync (synced across your browser instances)
-- **Security**: API keys are stored securely and only transmitted to the specified API endpoint
-- **Sharing**: Never shared with third parties or our servers
+- **Retention**: Until you delete the scripts or uninstall the extension
+- **Sharing**: Scripts remain in your browser and are not transmitted to our servers
 
-### 3. Page Context
-- **What we collect**: Current page URL, title, and selected HTML content
+### 2. Your Own LLM Settings
+- **What it is**: Your own LLM API key and base URL
+- **How it works**: You can use your own LLM API key and base URL to generate scripts
+- **Where it's stored**: In chrome.storage.sync (synced across your browser instances)
+- **Retention**: Until you delete the scripts or uninstall the extension
+- **Sharing**: Your LLM settings remain in your browser and are not transmitted to our servers
+
+### 3. Page Context and Script Requirements
+- **What we collect**: Current page URL, title, selected HTML content, and script requirements
 - **How we use it**: Temporarily for AI-powered script generation
 - **Where it's stored**: Only in memory during script generation
 - **Retention**: Deleted immediately after script generation
-- **Sharing**: Only shared with the AI service you configure when using script generation
+- **Sharing**: If you set up your own LLM, your page context and script requirements will be sent to your LLM server only, and are not transmitted to our servers.
 
-### 4. Tab Information
-- **What we collect**: Tab URLs and active script counts
-- **How we use it**: To track which scripts are active on each tab
-- **Where it's stored**: Temporarily in memory
-- **Retention**: Cleared when tabs are closed
-- **Sharing**: Never shared outside your browser
+## Data Collection
+We only collect data when you use the free generation feature, which includes:
+- Login credentials for authentication
+- Script requirements and page context for script generation
 
-## Third-party Services
-
-### AI Services
-- You can configure the extension to use OpenAI-compatible AI services
-- We only send data to the API endpoint you specify
-- The handling of data by these services is governed by their respective privacy policies
-- You can disable AI features by not providing API credentials
+If you don't use the free generation feature, no data is collected or transmitted to our servers.
 
 ## Data Security
+If you set up your own LLM
 - All data is stored locally in your browser
-- API keys are stored securely using chrome.storage.sync
 - No data is sent to our servers
-- Communication with AI services uses secure HTTPS connections
+- Script requirements and page context are sent to your LLM server
+
+If you choose to use our free generation feature
+- Communication with All My Web server uses secure HTTPS connections
+- Script requirements and page context might be recorded for service improvement purposes, and will not be shared with third parties
+
 
 ## User Rights and Controls
 You have full control over your data:
@@ -56,7 +52,6 @@ You have full control over your data:
 2. Edit or delete any script at any time
 3. Pause script execution without deleting
 4. Clear all data by uninstalling the extension
-5. Control AI feature usage through API settings
 
 ## Browser Permissions
 The extension requires these permissions:
